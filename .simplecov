@@ -8,5 +8,5 @@ SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
 SimpleCov.start do
   add_filter 'spec'
 
-  add_group 'lib/entity_validator', 'entity_validator'
+  add_group 'lib/poro_validator', 'poro_validator'
 end

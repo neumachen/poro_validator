@@ -1,4 +1,4 @@
-# Entity Validator
+# PORO Validator
 
 A lightweight validator for POROs.
 
@@ -13,7 +13,7 @@ A lightweight validator for POROs.
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/magicalbanana/entity_validator. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/magicalbanana/poro_validator. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](contributor-covenant.org) code of conduct.
 
 ## License
 
