@@ -1,17 +1,17 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'entity_validator/version'
+require 'poro_validator/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "entity_validator"
-  spec.version       = EntityValidator::VERSION
+  spec.name          = "poro_validator"
+  spec.version       = PoroValidator::VERSION
   spec.authors       = ["Kareem Gan"]
   spec.email         = ["kareemgan@gmail.com"]
 
   spec.summary       = %q{A PORO (Plain Old Ruby Object) validator.}
   spec.description   = %q{Validations for ruby objects or POROs.}
-  spec.homepage      = "https://github.com/magicalbanana/entity_validator"
+  spec.homepage      = "https://github.com/magicalbanana/poro_validator"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
