@@ -7,3 +7,6 @@
 /pkg/
 /spec/reports/
 /tmp/
+
+# Generated Markdown files
+*.md.html
