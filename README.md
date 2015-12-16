@@ -9,10 +9,10 @@
 A lightweight validator for POROs.
 
 ## TODO Features:
-- [ ] Create base validator class
-- [ ] Create basic validations (presence, format)
-- [ ] Allow multiple validations for a single attribute
-- [ ] Allow conditional validations
+- [x] Create base validator class
+- [x] Create basic validations (presence, format)
+- [x] Allow multiple validations for a single attribute
+- [x] Allow conditional validations
 - [ ] Nested validations
 - [ ] Hash validations
 - [ ] Support for i18n
