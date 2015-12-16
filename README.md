@@ -40,4 +40,4 @@ Copyright (c) 2015 Kareem Gan
 [BS img]: https://travis-ci.org/magicalbanana/poro_validator.svg
 [DS img]: https://gemnasium.com/magicalbanana/poro_validator.svg
 [CC img]: https://codeclimate.com/github/magicalbanana/poro_validator.svg
-[CS img]: https://coveralls.io/repos/magicalbanana/poro_validator/badge.svg?branch=master
+[CS img]: https://coveralls.io/repos/magicalbanana/poro_validator/badge.svg?branch=master&service=github
