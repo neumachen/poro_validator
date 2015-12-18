@@ -1,45 +1,52 @@
 require 'spec_helper'
 
 RSpec.describe PoroValidator::Validators::FormatValidator do
+  include SpecHelpers::ValidatorTestMacros
+
   describe "#validate" do
-    context "if the attribute is not present" do
-      context "and it passes the condition" do
-        it "assigns the attribute error" do
-          validator = Class.new do
-            include PoroValidator.validator
-            validates :name, format: /[a-z]/, if: proc { true }
-          end.new
+    let(:attribute)       { :name }
+    let(:attribute_value) { value }
+    let(:expected_error)  { nil }
+    let(:validation)      { { format: /[a-z]/ } }
+    let(:condition)       { true }
+    let(:conditions)      { { if: proc { condition } } }
 
-          entity = Class.new do
-            attr_accessor :name
-          end.new
+    # test_validator(
+    #   validator, entity
+    # ).expect_to_pass(condition: true, value: values[:valid])
+    #
+    # test_validator(
+    #   validator, entity
+    # ).expect_to_pass(condition: false, value: values[:valid])
 
-          entity.name = "0000"
+    context "if the condition is met" do
+      let(:condition) { true }
 
-          validator.valid?(entity)
-          expect(validator.errors[:name]).to_not be_empty
-          expect(validator.errors[:name]).to eq(["does not match the pattern: /[a-z]/"])
-        end
+      context "and the value is not valid" do
+        let(:value)          { "0000" }
+        let(:expected_error) { ["does not match the pattern: /[a-z]/"] }
+
+        expects_to_fail_validation
+      end
+
+      context "and the value is valid" do
+        let(:value) { "aaaa" }
+
+        expects_to_pass_validation
       end
     end
 
-    context "if the attribute is present" do
-      it "does not assign an attribute error" do
-        validator = Class.new do
-          include PoroValidator.validator
+    context "if the condition is not met" do
+      let(:condition) { false }
+      let(:value)     { "aaaa" }
 
-          validates :name, presence: true
-        end.new
+      expects_to_pass_validation
+    end
 
-        entity = Class.new do
-          attr_accessor :name
-        end.new
+    context "if the attribute value is not passed or is nil" do
+      let(:value) { nil }
 
-        entity.name = "manbearpig"
-
-        validator.valid?(entity)
-        expect(validator.errors[:name]).to be_nil
-      end
+      expects_to_pass_validation
     end
   end
 end

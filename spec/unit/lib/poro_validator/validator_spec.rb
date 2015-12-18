@@ -17,8 +17,14 @@ RSpec.describe PoroValidator::Validator do
   end
 
   describe "#valid?" do
-    let(:entity)    { TestHelpers::TestEntity.new }
-    let(:validator) { TestHelpers::TestEntityValidator.new }
+    let(:entity) { OpenStruct.new(name: nil) }
+    let(:validator) do
+      Class.new do
+        include PoroValidator.validator
+
+        validates :name, presence: true
+      end.new
+    end
 
     context "if the entity is not valid" do
       it "returns false" do
