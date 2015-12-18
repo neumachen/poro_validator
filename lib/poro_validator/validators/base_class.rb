@@ -15,7 +15,11 @@ module PoroValidator
       end
 
       def errors
-        @errors
+        @errors ||= context.errors
+      end
+
+      def context
+        @context
       end
 
       def validate(attribute, value, options)
@@ -26,8 +30,9 @@ module PoroValidator
 
       # @private
       def __validate__(validator_context)
-        @errors = validator_context.errors
-        value   = validator_context.entity.public_send(attribute)
+        @context = validator_context
+        @errors  = context.errors
+        value    = context.entity.public_send(attribute)
         validate(attribute, value, options)
       end
     end

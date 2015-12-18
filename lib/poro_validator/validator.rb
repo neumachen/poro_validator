@@ -13,7 +13,6 @@ module PoroValidator
         @validations ||= build_validations
       end
 
-
       private
 
       def build_validations(validations = [])

@@ -1,6 +1,8 @@
 module PoroValidator
   class Errors
 
+    attr_reader :store
+
     def initialize
       @store = ErrorStore.new
     end
@@ -44,8 +46,6 @@ module PoroValidator
     alias_method :[], :on
 
     private
-
-    attr_reader :store
 
     def message_lookup(msg, *msg_opts)
       msg.is_a?(Symbol) ? ::PoroValidator.configuration.message.get(msg, *msg_opts) : msg
