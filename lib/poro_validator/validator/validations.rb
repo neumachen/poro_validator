@@ -18,8 +18,13 @@ module PoroValidator
       end
 
       def build(attr, **options)
-        @validators = options.reject { |k,v| [:if, :unless].include?(k) }
-        @conditions = [] << options.select { |k,v| [:if, :unless].include?(k) }
+        @validators = options.reject do |k,v|
+          [:if, :unless].include?(k)
+        end
+
+        @conditions = [] << options.select do |k,v|
+          [:if, :unless].include?(k)
+        end
 
         @validators.each do |validator,options|
           nested_conditions = {}
