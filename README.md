@@ -13,7 +13,7 @@ A lightweight validator for POROs.
 - [x] Create basic validations (presence, format)
 - [x] Allow multiple validations for a single attribute
 - [x] Allow conditional validations
-- [ ] Nested validations
+- [x] Nested validations
 - [ ] Hash validations
 - [ ] Support for i18n
 

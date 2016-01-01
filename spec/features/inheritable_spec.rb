@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe "Allows a validator class to be subclassed" do
+RSpec.describe "Allows a validator class to be subclassed", type: :feature do
   context "if an existing validator is subclassed" do
     it "ensures that the validation rules are carried over" do
       class PersonValidator
