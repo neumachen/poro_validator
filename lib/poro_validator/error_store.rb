@@ -14,6 +14,11 @@ module PoroValidator
 
     def set(key, value = nil, &block)
       validate_key!(key)
+      if key.is_a?(::Array)
+        key = key.flatten.reverse.inject do |a,n|
+          { n => a }
+        end
+      end
       @data[key.to_s] = block_given? ? yield : value
     end
 
@@ -36,9 +41,10 @@ module PoroValidator
     private
 
     def validate_key!(key)
-      unless key.is_a?(String) || key.is_a?(Symbol)
+      unless key.is_a?(::String) || key.is_a?(::Symbol) || key.is_a?(::Array) \
+        || key.is_a?(::Hash)
         raise ::PoroValidator::InvalidType.new(
-          "only a String or Symbol is allowed! invalid key: #{key.inspect}"
+          "only String, Symbol, Array or Hash are allowed! invalid key: #{key.inspect}"
         )
       end
     end

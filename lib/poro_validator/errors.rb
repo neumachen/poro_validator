@@ -7,11 +7,11 @@ module PoroValidator
       @store = ErrorStore.new
     end
 
-    def add(attr, msg, *msg_opts)
+    def add(attr, validator, *msg_opts)
       if store.set?(attr)
-        store.get(attr) << message_lookup(msg, *msg_opts)
+        store.get(attr) << message_lookup(validator, *msg_opts)
       else
-        store.set(attr, [message_lookup(msg, *msg_opts)])
+        store.set(attr, [message_lookup(validator, *msg_opts)])
       end
     end
 
@@ -47,8 +47,10 @@ module PoroValidator
 
     private
 
-    def message_lookup(msg, *msg_opts)
-      msg.is_a?(Symbol) ? ::PoroValidator.configuration.message.get(msg, *msg_opts) : msg
+    def message_lookup(validator, *msg_opts)
+      validator.is_a?(Symbol) ? ::PoroValidator.configuration.message.get(
+        validator, *msg_opts
+      ) : validator
     end
   end
 end

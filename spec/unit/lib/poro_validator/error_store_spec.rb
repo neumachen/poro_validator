@@ -34,7 +34,7 @@ RSpec.describe PoroValidator::ErrorStore do
 
     context "if the key is not valid" do
       it "raises TypeError exception" do
-        expect { store.get(['foo', 'faa']) }.to raise_error(
+        expect { store.get(1) }.to raise_error(
           ::PoroValidator::InvalidType
         )
       end
@@ -63,7 +63,6 @@ RSpec.describe PoroValidator::ErrorStore do
           store.set(key)
           expect(store.get(key)).to be_nil
         end
-
       end
 
       context "and a block is passed is as a value" do
