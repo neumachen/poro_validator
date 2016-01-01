@@ -1,6 +1,8 @@
 module PoroValidator
   module Validators
     class BaseClass
+      attr_writer :attribute
+
       def initialize(attribute, options = {})
         @attribute = attribute
         @options   = options
@@ -15,7 +17,15 @@ module PoroValidator
       end
 
       def errors
-        @errors
+        @errors ||= context.errors
+      end
+
+      def context
+        @context
+      end
+
+      def nested?
+        attribute.is_a?(::Array)
       end
 
       def validate(attribute, value, options)
@@ -24,10 +34,18 @@ module PoroValidator
         )
       end
 
+      def value
+        if nested?
+          @value = attribute.flatten.inject(context.entity, :public_send)
+        else
+          @value = context.entity.public_send(attribute)
+        end
+      end
+
       # @private
       def __validate__(validator_context)
-        @errors = validator_context.errors
-        value   = validator_context.entity.public_send(attribute)
+        @context = validator_context
+        @errors  = context.errors
         validate(attribute, value, options)
       end
     end

@@ -41,6 +41,7 @@ require "poro_validator/validator/context"
 require "poro_validator/validators/base_class"
 require "poro_validator/validators/presence_validator"
 require "poro_validator/validators/format_validator"
+require "poro_validator/validators/with_validator"
 
 # Modules
 require "poro_validator/validator"

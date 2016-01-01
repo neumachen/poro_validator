@@ -10,4 +10,5 @@ module PoroValidator
   class InvalidCondition < Exceptions; end
   class InvalidType < Exceptions; end
   class OverloadriddenRequired < Exceptions; end
+  class InvalidValidator < Exceptions; end
 end

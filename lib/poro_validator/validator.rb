@@ -5,14 +5,20 @@ module PoroValidator
     end
 
     module ClassMethods
-      def validates(attr_name, **options)
-        validations.build(attr_name, **options)
+      def validates(attr_name, **options, &block)
+        if block_given?
+          nested_validations = build_nested_validations(attr_name, &block)
+          nested_validations.each do |nested_validation|
+            validations << nested_validation
+          end
+        else
+          validations.build(attr_name, **options)
+        end
       end
 
       def validations
         @validations ||= build_validations
       end
-
 
       private
 
@@ -22,6 +28,17 @@ module PoroValidator
 
       def validates_with(vals)
         @validations = vals
+      end
+
+      def build_nested_validations(attr_name, &block)
+        nested_validator = Class.new do
+          include PoroValidator.validator
+        end
+        nested_validator.instance_eval(&block)
+        nested_validations = nested_validator.validations.validations
+        nested_validations.each do |nv|
+          nv[:validator].attribute = [attr_name, nv[:validator].attribute]
+        end
       end
 
       # Ensures that when a Validator class is subclassed, the
