@@ -11,6 +11,7 @@ RSpec.describe PoroValidator::Validators::FormatValidator do
     let(:condition)       { true }
     let(:conditions)      { { if: proc { condition } } }
 
+    # TODO: Create this customer validator macro/matcher
     # test_validator(
     #   validator, entity
     # ).expect_to_pass(condition: true, value: values[:valid])
