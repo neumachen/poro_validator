@@ -44,6 +44,7 @@ require "poro_validator/validators/format_validator"
 require "poro_validator/validators/with_validator"
 require "poro_validator/validators/inclusion_validator"
 require "poro_validator/validators/integer_validator"
+require "poro_validator/validators/float_validator"
 
 # Modules
 require "poro_validator/validator"
