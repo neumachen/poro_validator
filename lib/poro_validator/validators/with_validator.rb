@@ -1,15 +1,14 @@
 module PoroValidator
   module Validators
     class WithValidator < BaseClass
-
       def validate(attribute, value, options)
-        klass = options.fetch(:with)
-        case klass
+        validator_class = options.fetch(:with)
+        case validator_class
         when Class
-          k = klass.new
-          k.valid?(context.entity.send(attribute))
-          k.errors.send(:store).data.each do |k,v|
-            errors.add(attribute, [k, v])
+          klass = validator_class.new
+          klass.valid?(context.entity.send(attribute))
+          klass.errors.send(:store).data.each do |k,v|
+            errors.add([attribute, k.to_sym], v.pop)
           end
         else
           raise ::PoroValidator::InvalidValidator.new(

@@ -4,50 +4,45 @@ RSpec.describe PoroValidator::Validators::FormatValidator do
   include SpecHelpers::ValidatorTestMacros
 
   describe "#validate" do
-    let(:attribute)       { :name }
-    let(:attribute_value) { value }
-    let(:expected_error)  { nil }
-    let(:validation)      { { format: /[a-z]/ } }
-    let(:condition)       { true }
-    let(:conditions)      { { if: proc { condition } } }
+    subject(:validator) do
+      Class.new do
+        include PoroValidator.validator
 
-    # TODO: Create this customer validator macro/matcher
-    # test_validator(
-    #   validator, entity
-    # ).expect_to_pass(condition: true, value: values[:valid])
-    #
-    # test_validator(
-    #   validator, entity
-    # ).expect_to_pass(condition: false, value: values[:valid])
+        validates :first_name, format: /[a-z]/
+        validates :last_name, format: /[a-z]/, if: proc { true }
+        validates :dob, format: /[0-9]/, if: proc { false }
+      end.new
+    end
 
-    context "if the condition is met" do
-      let(:condition) { true }
-
-      context "and the value is not valid" do
-        let(:value)          { "0000" }
-        let(:expected_error) { ["does not match the pattern: /[a-z]/"] }
-
-        expects_to_fail_validation
+    expect_validator_to_be_invalid do
+      let(:entity) do
+        OpenStruct.new(
+          first_name: "0000",
+          last_name: "1111",
+          dob: "aaaa"
+        )
       end
 
-      context "and the value is valid" do
-        let(:value) { "aaaa" }
+      let(:expected_errors) do
+        {
+          "first_name" => ["does not match the pattern: /[a-z]/"],
+          "last_name" => ["does not match the pattern: /[a-z]/"]
+        }
+      end
 
-        expects_to_pass_validation
+      skip_attr_unmet_condition do
+        let(:attr) { :dob }
       end
     end
 
-    context "if the condition is not met" do
-      let(:condition) { false }
-      let(:value)     { "aaaa" }
-
-      expects_to_pass_validation
-    end
-
-    context "if the attribute value is not passed or is nil" do
-      let(:value) { nil }
-
-      expects_to_pass_validation
+    expect_validator_to_be_valid do
+      let(:entity) do
+        OpenStruct.new(
+          first_name: "manbearpig",
+          last_name: "gore",
+          dob: "01/01/1977"
+        )
+      end
     end
   end
 end

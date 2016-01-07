@@ -11,47 +11,80 @@ RSpec.describe PoroValidator::Validators::WithValidator do
   include SpecHelpers::ValidatorTestMacros
 
   describe "#validate" do
-    let(:attribute)       { :address }
-    let(:attribute_value) { value }
-    let(:expected_error)  { nil }
-    let(:validation)      { { with: AddressValidator } }
-    let(:condition)       { true }
-    let(:conditions)      { { if: proc { condition } } }
+    subject(:validator) do
+      Class.new do
+        include PoroValidator.validator
 
-    context "if the condition is met" do
-      let(:condition) { true }
+        validates :first_name, presence: true
+        validates :last_name, presence: true, if: proc { true }
+        validates :dob, presence: true, if: proc { false }
+        validates :address, with: AddressValidator
+      end.new
+    end
 
-      context "and the value is not valid" do
-        let(:value)          { OpenStruct.new(line1: nil, line2: nil) }
-        let(:expected_error) do
-          [
-            ["line1", ["is not present"]],
-            ["line2", ["is not present"]]
-          ]
-        end
-
-        expects_to_fail_validation
+    expect_validator_to_be_invalid do
+      let(:entity) do
+        OpenStruct.new(
+          first_name: nil,
+          last_name: nil,
+          dob: nil,
+          address: OpenStruct.new(
+            line1: nil,
+            line2: nil
+          )
+        )
       end
 
-      context "and the value is valid" do
-        let(:value) { OpenStruct.new(line1: "foo", line2: "boo") }
+      let(:expected_errors) do
+        {
+          "first_name" => ["is not present"],
+          "last_name" => ["is not present"],
+          "{:address=>:line1}" => ["is not present"],
+          "{:address=>:line2}" => ["is not present"]
+        }
+      end
 
-        expects_to_pass_validation
+      skip_attr_unmet_condition do
+        let(:attr) { :dob }
       end
     end
 
-    context "if the condition is not met" do
-      let(:condition) { false }
-      let(:value)     { OpenStruct.new(line1: "foo", line2: "boo") }
-
-      expects_to_pass_validation
+    expect_validator_to_be_valid do
+      let(:entity) do
+        OpenStruct.new(
+          first_name: "manbearpig",
+          last_name: "gore",
+          dob: "01/01/1977",
+          address: OpenStruct.new(
+            line1: "foo",
+            line2: "boo"
+          )
+        )
+      end
     end
 
-    context "if a non class is passed for with:" do
-      let(:value)      { OpenStruct.new(line1: "foo", line2: "boo") }
-      let(:validation) { { with: :presence } }
+    context "non class is passed for with:" do
+      let(:entity) do
+        OpenStruct.new
+      end
 
-      expects_to_raise_error
+      subject(:validator) do
+        Class.new do
+          include PoroValidator.validator
+
+          validates :first_name, presence: true
+          validates :last_name, presence: true, if: proc { true }
+          validates :dob, presence: true, if: proc { false }
+          validates :address, with: :presence
+        end.new
+      end
+
+      it "raises an error" do
+        expect { subject.valid?(entity) }.to raise_error(
+          ::PoroValidator::InvalidValidator,
+          "Requires a class object for this validator."
+        )
+      end
     end
   end
 end
