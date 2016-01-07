@@ -5,6 +5,7 @@ module PoroValidator
       DEFAULT_MESSAGES = {
         default:   lambda { "is not valid" },
         presence:  lambda { "is not present" },
+        integer:   lambda { "is not an integer" },
 
         inclusion: lambda do |range|
           "is not within the range of #{range.inspect}"
