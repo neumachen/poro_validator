@@ -3,76 +3,76 @@ module SpecHelpers
     extend SpecHelpers::Concerns
 
     included do
-      let(:attribute)       { raise "You must override attribute" }
-      let(:validation)      { raise "You must override validator" }
-      let(:conditions)      { raise "You must override conditions" }
-      let(:attribute_value) { raise "You must override valid_value" }
-      let(:expected_error)  { raise "You must override expected_error" }
+      let(:entity)          { raise "You must override the let(:entity)" }
+      let(:expected_errors) { raise "You must override let(:expected_errors)" }
+
+      subject(:validator) do
+        raise "You must override the subject(:validator)"
+      end
     end
 
     module ClassMethods
-      def expects_to_pass_validation(&block)
-        it "does not assign an error to the attribute" do
-          # without calling the let variable attribute or any of within the
-          # included do block, it returns undefined method. But calling the
-          # let variable attribute and assigning it to another variable works.
-          # It must have something todo with scoping.
-          attr    = attribute
-          options = validation.merge(conditions)
+      def expect_validator_to_be_valid(&block)
+        example_group = context("valid entity", caller: caller) do
+          it "returns false for #valid?" do
+            expect(validator.valid?(entity)).to be_truthy
+          end
 
-          value   = attribute_value
-
-          validator = Class.new do
-            include PoroValidator.validator
-
-            validates attr, options
-          end.new
-
-          entity = OpenStruct.new(attribute => value)
-
-          expect(validator.valid?(entity)).to be_truthy
-          expect(validator.errors[attr]).to eq(expected_error)
+          it "returns a count of 0 for #errors.count" do
+            validator.valid?(entity)
+            expect(validator.errors.count).to eq(0)
+          end
         end
+
+        example_group.class_eval(&block) if block_given?
       end
 
-      def expects_to_fail_validation(&block)
-        it "assigns an error to the attribute" do
-          attr    = attribute
-          options = validation.merge(conditions)
+      def expect_validator_to_be_invalid(&block)
+        example_group = context("invalid entity", caller: caller) do
+          it "returns false for #valid?" do
+            expect(validator.valid?(entity)).to be_falsey
+          end
 
-          value   = attribute_value
+          it "returns a count greater than 0 for #errors.count" do
+            validator.valid?(entity)
+            expect(validator.errors.count).to be > 0
+          end
 
-          validator = Class.new do
-            include PoroValidator.validator
-
-            validates attr, options
-          end.new
-
-          entity = OpenStruct.new(attribute => value)
-
-          expect(validator.valid?(entity)).to be_falsey
-          expect(validator.errors[attr]).to eq(expected_error)
+          it "sets the errors for the given attributes" do
+            validator.valid?(entity)
+            validator.errors.store.data.each do |attr, value|
+              expect(expected_errors[attr]).to_not be_nil,
+                "no expected_errors for #{attr}"
+              expect(expected_errors[attr]).to eq(value),
+                "expected_errors[#{attr}] did not match #{value}"
+            end
+          end
         end
+
+        example_group.class_eval(&block) if block_given?
       end
 
-      def expects_to_raise_error
-        it "raises an error" do
-          attr    = attribute
-          options = validation.merge(conditions)
+      def skip_attr_unmet_condition(&block)
+        example_group = context("validation's condition unment", caller: caller) do
+          let(:attr) { raise "You must override the let(:attr)!" }
 
-          value   = attribute_value
+          it "expects that attribute is not valid" do
+            validations = \
+              validator.class.validations.validations.inject({}) do |r, validation|
+              r[validation[:validator].attribute] = validation[:validator].options
+              r
+            end
 
-          validator = Class.new do
-            include PoroValidator.validator
+            expect(entity.public_send(attr)).to_not match(/[0-9]/)
+          end
 
-            validates attr, options
-          end.new
-
-          entity = OpenStruct.new(attribute => value)
-
-          expect { validator.valid?(entity) }.to raise_error
+          it "does not validate the attribute: dob" do
+            validator.valid?(entity)
+            expect(validator.errors.on(:dob)).to be_nil
+          end
         end
 
+        example_group.class_eval(&block) if block_given?
       end
     end
   end
