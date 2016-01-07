@@ -3,9 +3,16 @@ module PoroValidator
     class Message
       # @private_const
       DEFAULT_MESSAGES = {
-        default:  lambda { "is not valid" },
-        format:   lambda { |pattern| "does not match the pattern: #{pattern.inspect}"},
-        presence: lambda { "is not present" }
+        default:   lambda { "is not valid" },
+        presence:  lambda { "is not present" },
+
+        inclusion: lambda do |range|
+          "is not within the range of #{range.inspect}"
+        end,
+
+        format:    lambda do |pattern|
+          "does not match the pattern: #{pattern.inspect}"
+        end
       }
 
       def initialize
