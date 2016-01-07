@@ -66,9 +66,10 @@ module SpecHelpers
             expect(entity.public_send(attr)).to_not match(/[0-9]/)
           end
 
-          it "does not validate the attribute: dob" do
+          it "does not validate the attribute" do
+            expect(entity).to respond_to(attr)
             validator.valid?(entity)
-            expect(validator.errors.on(:dob)).to be_nil
+            expect(validator.errors.on(attr)).to be_nil
           end
         end
 

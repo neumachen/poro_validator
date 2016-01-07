@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe PoroValidator::Validators::InclusionValidator do
+RSpec.describe PoroValidator::Validators::IntegerValidator do
   include SpecHelpers::ValidatorTestMacros
 
   describe "#validate" do
@@ -8,22 +8,22 @@ RSpec.describe PoroValidator::Validators::InclusionValidator do
       Class.new do
         include PoroValidator.validator
 
-        validates :amount, inclusion: 1..10
-        validates :rate, inclusion: 1..10, if: proc { false }
+        validates :amount, integer: true
+        validates :rate, integer: true, if: proc { false }
       end.new
     end
 
     expect_validator_to_be_invalid do
       let(:entity) do
         OpenStruct.new(
-          amount: 11,
-          rate: 11
+          amount: "aaa",
+          rate: "aaa"
         )
       end
 
       let(:expected_errors) do
         {
-          "amount" => ["is not within the range of 1..10"]
+          "amount" => ["is not an integer"]
         }
       end
 
