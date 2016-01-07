@@ -4,35 +4,45 @@ RSpec.describe PoroValidator::Validators::PresenceValidator do
   include SpecHelpers::ValidatorTestMacros
 
   describe "#validate" do
-    let(:attribute)       { :name }
-    let(:attribute_value) { value }
-    let(:expected_error)  { nil }
-    let(:validation)      { { presence: true } }
-    let(:condition)       { true }
-    let(:conditions)      { { if: proc { condition } } }
+    subject(:validator) do
+      Class.new do
+        include PoroValidator.validator
 
-    context "if the condition is met" do
-      let(:condition) { true }
+        validates :first_name, presence: true
+        validates :last_name, presence: true, if: proc { true }
+        validates :dob, presence: true, if: proc { false }
+      end.new
+    end
 
-      context "and the value is not valid" do
-        let(:value)          { nil }
-        let(:expected_error) { ["is not present"] }
-
-        expects_to_fail_validation
+    expect_validator_to_be_invalid do
+      let(:entity) do
+        OpenStruct.new(
+          first_name: nil,
+          last_name: nil,
+          dob: nil
+        )
       end
 
-      context "and the value is valid" do
-        let(:value) { "aaaa" }
+      let(:expected_errors) do
+        {
+          "first_name" => ["is not present"],
+          "last_name" => ["is not present"],
+        }
+      end
 
-        expects_to_pass_validation
+      skip_attr_unmet_condition do
+        let(:attr) { :dob }
       end
     end
 
-    context "if the condition is not met" do
-      let(:condition) { false }
-      let(:value)     { "aaaa" }
-
-      expects_to_pass_validation
+    expect_validator_to_be_valid do
+      let(:entity) do
+        OpenStruct.new(
+          first_name: "manbearpig",
+          last_name: "gore",
+          dob: "01/01/1977"
+        )
+      end
     end
   end
 end
