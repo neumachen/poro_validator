@@ -14,6 +14,10 @@ module PoroValidator
 
         format: lambda do |pattern|
           "does not match the pattern: #{pattern.inspect}"
+        end,
+
+        length: lambda do |length|
+          "does not match the length options: #{length.inspect}"
         end
       }
 
