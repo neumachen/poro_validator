@@ -20,7 +20,12 @@ module SpecHelpers
 
           it "returns a count of 0 for #errors.count" do
             validator.valid?(entity)
-            expect(validator.errors.count).to eq(0)
+            expect(validator.errors.count).to eq(0),
+              expected_message = [
+                "expected error count: 0",
+                "actual error count: #{validator.errors.count}",
+                "object: #{validator.errors.inspect}"
+              ].join("\n")
           end
         end
 
@@ -35,16 +40,34 @@ module SpecHelpers
 
           it "returns a count greater than 0 for #errors.count" do
             validator.valid?(entity)
-            expect(validator.errors.count).to be > 0
+            expect(validator.errors.count).to be > 0,
+              expected_message = [
+                "expected: 0 errors",
+                "  actual: #{validator.errors.count} errors",
+                "  object: #{validator.errors.inspect}"
+              ].join("\n")
           end
 
           it "sets the errors for the given attributes" do
             validator.valid?(entity)
+            expected_errors.each do |key, value|
+              expect(validator.errors.on(key)).to_not be_nil,
+                expected_message = [
+                  "expected: #{key} to have no errors",
+                  "  actual: #{validator.errors.on(key).inspect}",
+                ].join("\n")
+            end
             validator.errors.store.data.each do |attr, value|
               expect(expected_errors[attr]).to_not be_nil,
-                "no expected_errors for #{attr}"
+                expected_message = [
+                  "expected: #{attr} to have no errors",
+                  "  actual: #{validator.errors.on(attr).inspect}",
+                ].join("\n")
               expect(expected_errors[attr]).to eq(value),
-                "expected_errors[#{attr}] did not match #{value}"
+                expected_message = [
+                  "expected: #{expected_errors[attr]}",
+                  "  actual: #{validator.errors.on(attr).inspect}",
+                ].join("\n")
             end
           end
         end
@@ -56,20 +79,14 @@ module SpecHelpers
         example_group = context("validation's condition unment", caller: caller) do
           let(:attr) { raise "You must override the let(:attr)!" }
 
-          it "expects that attribute is not valid" do
-            validations = \
-              validator.class.validations.validations.inject({}) do |r, validation|
-              r[validation[:validator].attribute] = validation[:validator].options
-              r
-            end
-
-            expect(entity.public_send(attr)).to_not match(/[0-9]/)
-          end
-
           it "does not validate the attribute" do
             expect(entity).to respond_to(attr)
             validator.valid?(entity)
-            expect(validator.errors.on(attr)).to be_nil
+            expect(validator.errors.on(attr)).to be_nil,
+              expected_message = [
+                "expected: no errors for #{attr}",
+                "     got: #{validator.errors.on(attr).inspect}",
+              ].join("\n")
           end
         end
 

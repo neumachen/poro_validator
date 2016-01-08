@@ -18,6 +18,10 @@ module PoroValidator
 
         length: lambda do |length|
           "does not match the length options: #{length.inspect}"
+        end,
+
+        numeric: lambda do |numeric|
+          "does not match the numeric options: #{numeric.inspect}"
         end
       }
 
