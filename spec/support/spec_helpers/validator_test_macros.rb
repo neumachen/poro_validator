@@ -22,9 +22,9 @@ module SpecHelpers
             validator.valid?(entity)
             expect(validator.errors.count).to eq(0),
               expected_message = [
-                "expected error count: 0",
-                "actual error count: #{validator.errors.count}",
-                "object: #{validator.errors.inspect}"
+                "expected: 0 errors",
+                "  actual: #{validator.errors.count} errors",
+                "  object: #{validator.errors.inspect}"
               ].join("\n")
           end
         end
@@ -50,13 +50,15 @@ module SpecHelpers
 
           it "sets the errors for the given attributes" do
             validator.valid?(entity)
+
             expected_errors.each do |key, value|
               expect(validator.errors.on(key)).to_not be_nil,
                 expected_message = [
-                  "expected: #{key} to have no errors",
+                  "expected: #{key} to have an error",
                   "  actual: #{validator.errors.on(key).inspect}",
                 ].join("\n")
             end
+
             validator.errors.store.data.each do |attr, value|
               expect(expected_errors[attr]).to_not be_nil,
                 expected_message = [
@@ -85,7 +87,7 @@ module SpecHelpers
             expect(validator.errors.on(attr)).to be_nil,
               expected_message = [
                 "expected: no errors for #{attr}",
-                "     got: #{validator.errors.on(attr).inspect}",
+                "  actual: #{validator.errors.on(attr).inspect}",
               ].join("\n")
           end
         end

@@ -57,7 +57,6 @@ RSpec.describe PoroValidator::Validator::BaseClass do
 
         subject.run_validations(kontext)
       end
-
     end
   end
 end
