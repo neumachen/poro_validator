@@ -38,4 +38,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('pry-stack_explorer', '~> 0.4.9.0')
   spec.add_development_dependency('ruby-graphviz', '~> 1.2.2')
   spec.add_development_dependency('recursive-open-struct', '~> 1.0.0')
+  spec.add_development_dependency('nyan-cat-formatter', '~> 0.11')
 end
