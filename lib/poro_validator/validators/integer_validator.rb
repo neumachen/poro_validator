@@ -3,13 +3,12 @@ module PoroValidator
     class IntegerValidator < BaseClass
       def validate(attribute, value, options)
         message = options.fetch(:message, :integer)
-        on = options.fetch(:on, attribute)
 
         begin
           Kernel.Integer(value.to_s)
           nil
         rescue
-          errors.add(on, message)
+          errors.add(attribute, message)
         end
       end
 
