@@ -3,14 +3,13 @@ module PoroValidator
     class LengthValidator < BaseClass
       def validate(attribute, value, options)
         message = options.fetch(:message, :length)
-        on = options.fetch(:on, attribute)
 
         options.keys.each do |key|
           matcher = matchers(key)
           next if matcher.nil?
           v = value.is_a?(::String) ? value : value.to_s
           unless matchers(key).call(v, options[key])
-            errors.add(on, message, key => options[key])
+            errors.add(attribute, message, key => options[key])
           end
         end
       end

@@ -5,10 +5,9 @@ module PoroValidator
         range = options.fetch(:in)
         inclusion_method = range.respond_to?(:cover?) ? :cover? : :include?
         message = options.fetch(:message, :inclusion)
-        on = options.fetch(:on, attribute)
 
         unless range.send(inclusion_method, value)
-          errors.add(on, message, range)
+          errors.add(attribute, message, range)
         end
       end
     end

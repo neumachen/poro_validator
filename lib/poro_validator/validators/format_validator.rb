@@ -6,10 +6,9 @@ module PoroValidator
 
         pattern = options.fetch(:with)
         message = options.fetch(:message, :format)
-        on      = options.fetch(:on, attribute)
 
         unless value.to_s =~ pattern
-          errors.add(on, message, pattern)
+          errors.add(attribute, message, pattern)
         end
       end
     end

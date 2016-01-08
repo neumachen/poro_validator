@@ -6,8 +6,8 @@ module PoroValidator
         case validator_class
         when Class
           klass = validator_class.new
-          klass.valid?(context.entity.send(attribute))
-          klass.errors.send(:store).data.each do |k,v|
+          klass.valid?(context.entity.public_send(attribute))
+          klass.errors.public_send(:store).data.each do |k,v|
             errors.add([attribute, k.to_sym], v.pop)
           end
         else
