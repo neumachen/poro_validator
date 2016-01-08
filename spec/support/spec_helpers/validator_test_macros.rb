@@ -60,13 +60,13 @@ module SpecHelpers
             validator.errors.store.data.each do |attr, value|
               expect(expected_errors[attr]).to_not be_nil,
                 expected_message = [
-                  "expected: #{key} to have no errors",
-                  "  actual: #{validator.errors.on(key).inspect}",
+                  "expected: #{attr} to have no errors",
+                  "  actual: #{validator.errors.on(attr).inspect}",
                 ].join("\n")
               expect(expected_errors[attr]).to eq(value),
                 expected_message = [
                   "expected: #{expected_errors[attr]}",
-                  "  actual: #{validator.errors.on(key).inspect}",
+                  "  actual: #{validator.errors.on(attr).inspect}",
                 ].join("\n")
             end
           end
