@@ -27,16 +27,16 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_development_dependency("bundler", "~> 1.10")
-  spec.add_development_dependency("rake", "~> 10.0")
+  spec.add_development_dependency("bundler")
+  spec.add_development_dependency("rake")
   spec.add_development_dependency("rspec")
-  spec.add_development_dependency('simplecov', '~> 0.8.0')
-  spec.add_development_dependency('coveralls', '~> 0.7.0')
-  spec.add_development_dependency('rspec', '~> 3.1.0')
-  spec.add_development_dependency('pry-byebug', '~> 3.1.0')
-  spec.add_development_dependency('pry-rescue', '~> 1.4.0')
-  spec.add_development_dependency('pry-stack_explorer', '~> 0.4.9.0')
-  spec.add_development_dependency('ruby-graphviz', '~> 1.2.2')
-  spec.add_development_dependency('recursive-open-struct', '~> 1.0.0')
-  spec.add_development_dependency('nyan-cat-formatter', '~> 0.11')
+  spec.add_development_dependency('simplecov')
+  spec.add_development_dependency('coveralls')
+  spec.add_development_dependency('rspec')
+  spec.add_development_dependency('pry-byebug')
+  spec.add_development_dependency('pry-rescue')
+  spec.add_development_dependency('pry-stack_explorer')
+  spec.add_development_dependency('ruby-graphviz')
+  spec.add_development_dependency('recursive-open-struct')
+  spec.add_development_dependency('nyan-cat-formatter')
 end
