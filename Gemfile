@@ -1,4 +1,11 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in poro_validator.gemspec
 gemspec
+
+group :tools do
+  gem 'pry'
+  gem 'pry-byebug'
+  gem 'pry-rescue'
+  gem 'pry-stack_explorer'
+  gem 'ruby-graphviz'
+end

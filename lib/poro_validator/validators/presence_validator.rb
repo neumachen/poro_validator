@@ -3,7 +3,7 @@ module PoroValidator
     class PresenceValidator < BaseClass
       def validate(attribute, value, options)
         message = options.fetch(:message, :presence)
-        v   = value.is_a?(String) ? value.gsub(/\s+/, '') : value
+        v = value.is_a?(String) ? value.gsub(/\s+/, '') : value
 
         if v.nil? || v.respond_to?(:empty?) && v.empty?
           errors.add(attribute, message)

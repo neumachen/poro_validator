@@ -1,5 +1,5 @@
-require 'rspec'
 require 'simplecov'
+require 'rspec'
 require 'poro_validator'
 
 Dir["./spec/support/**/*.rb"].sort.each { |f| require f }

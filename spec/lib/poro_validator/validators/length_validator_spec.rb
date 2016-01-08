@@ -25,7 +25,7 @@ RSpec.describe PoroValidator::Validators::LengthValidator do
       let(:entity) do
         OpenStruct.new(
           title:   gen_random_char(rand(11..15)),
-          subject: gen_random_char(rand(1..10)),
+          subject: gen_random_char(rand(2..10)),
           comment: gen_random_char(rand(21..25)),
           info:    gen_random_char(rand(1..9)),
           status:  gen_random_char(rand(11..15)),
