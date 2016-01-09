@@ -10,6 +10,7 @@ RSpec.describe PoroValidator::Validators::PresenceValidator do
 
         validates :first_name, presence: true
         validates :last_name, presence: true, if: proc { true }
+        validates :nickname, presence: { allow_blank: true }
         validates :dob, presence: true, if: proc { false }
       end.new
     end
@@ -19,6 +20,7 @@ RSpec.describe PoroValidator::Validators::PresenceValidator do
         OpenStruct.new(
           first_name: nil,
           last_name: nil,
+          nickname: nil,
           dob: nil
         )
       end
@@ -26,7 +28,8 @@ RSpec.describe PoroValidator::Validators::PresenceValidator do
       let(:expected_errors) do
         {
           "first_name" => ["is not present"],
-          "last_name" => ["is not present"],
+          "last_name"  => ["is not present"],
+          "nickname"   => ["is not present"]
         }
       end
 
@@ -40,6 +43,7 @@ RSpec.describe PoroValidator::Validators::PresenceValidator do
         OpenStruct.new(
           first_name: "manbearpig",
           last_name: "gore",
+          nickname: "",
           dob: "01/01/1977"
         )
       end
