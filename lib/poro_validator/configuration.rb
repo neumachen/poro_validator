@@ -12,6 +12,10 @@ module PoroValidator
           "is not within the range of #{range.inspect}"
         end,
 
+        exclusion: lambda do |range|
+          "is not outside the range of #{range.inspect}"
+        end,
+
         format: lambda do |pattern|
           "does not match the pattern: #{pattern.inspect}"
         end,
