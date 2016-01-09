@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe PoroValidator::Validators::InclusionValidator do
+RSpec.describe PoroValidator::Validators::ExclusionValidator do
   include SpecHelpers::ValidatorTestMacros
 
   describe "#validate" do
@@ -8,25 +8,25 @@ RSpec.describe PoroValidator::Validators::InclusionValidator do
       Class.new do
         include PoroValidator.validator
 
-        validates :amount, inclusion: 1..10
-        validates :tier, inclusion: [1,2,3,4,5]
-        validates :rate, inclusion: 1..10, if: proc { false }
+        validates :amount, exclusion: 5..10
+        validates :tier, exclusion: [1,2,3,4,5]
+        validates :rate, exclusion: 5..10, if: proc { false }
       end.new
     end
 
     expect_validator_to_be_invalid do
       let(:entity) do
         OpenStruct.new(
-          amount: 11,
-          tier: 6,
-          rate: 11
+          amount: 6,
+          tier: 5,
+          rate: 5
         )
       end
 
       let(:expected_errors) do
         {
-          "amount" => ["is not within the range of 1..10"],
-          "tier"   => ["is not within the range of [1, 2, 3, 4, 5]"]
+          "amount" => ["is not outside the range of 5..10"],
+          "tier"   => ["is not outside the range of [1, 2, 3, 4, 5]"]
         }
       end
 
@@ -40,7 +40,7 @@ RSpec.describe PoroValidator::Validators::InclusionValidator do
             Class.new do
               include PoroValidator.validator
 
-              validates :amount, inclusion: "hello"
+              validates :amount, exclusion: "hello"
             end.new
           end
 
@@ -56,7 +56,7 @@ RSpec.describe PoroValidator::Validators::InclusionValidator do
             Class.new do
               include PoroValidator.validator
 
-              validates :amount, inclusion: { in: "hello" }
+              validates :amount, exclusion: { in: "hello" }
             end.new
           end
 
@@ -72,8 +72,8 @@ RSpec.describe PoroValidator::Validators::InclusionValidator do
     expect_validator_to_be_valid do
       let(:entity) do
         OpenStruct.new(
-          amount: 5,
-          tier: 3
+          amount: 4,
+          tier: 6
         )
       end
     end
