@@ -1,21 +1,10 @@
 module PoroValidator
   module Validators
-    class ExclusionValidator < BaseClass
+    class ExclusionValidator < RangeArrayValidator
       def validate(attribute, value, options)
-        range = options.fetch(:in, nil)
+        in_option = options[:in]
 
-        if range.nil?
-          raise ::PoroValidator::InvalidValidator,
-            [
-              "There was no range or array specified. Pass in a range or array.",
-              "e.g",
-              "validates :foo, exclusion: 1..10",
-              "or",
-              "validates :boo, exclusion: { in: 1..10 }"
-          ].join("\n")
-        end
-
-        unless range.is_a?(::Range) || range.is_a?(::Array)
+        unless validate_option(in_option)
           raise ::PoroValidator::InvalidValidator,
             [
               "There was no range or array specified. Pass in a range or array.",
@@ -28,18 +17,8 @@ module PoroValidator
 
         message = options.fetch(:message, :exclusion)
 
-        if range.respond_to?(:cover?)
-          if range.cover?(value)
-            errors.add(attribute, message, range)
-            return
-          end
-        end
-
-        if range.respond_to?(:include?)
-          if range.include?(value)
-            errors.add(attribute, message, range)
-            return
-          end
+        if covered?(in_option, value) || included?(in_option, value)
+          errors.add(attribute, message, in_option)
         end
       end
     end
