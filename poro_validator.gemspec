@@ -34,4 +34,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('coveralls')
   spec.add_development_dependency('recursive-open-struct')
   spec.add_development_dependency('nyan-cat-formatter')
+  # = MANIFEST =
+  # = MANIFEST =
 end
