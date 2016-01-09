@@ -120,7 +120,7 @@ task gemspec: :validate do
     join("\n")
 
   # piece file back together and write
-  manifest = "  gem.files = %w[\n#{files}\n  ]\n"
+  manifest = "  spec.files = %w[\n#{files}\n  ]\n"
   spec = [head, manifest, tail].join("  # = MANIFEST =\n")
   File.open(gemspec_file, 'w') { |io| io.write(spec) }
   puts "Updated #{gemspec_file}"
