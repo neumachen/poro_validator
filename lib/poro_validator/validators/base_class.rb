@@ -17,7 +17,7 @@ module PoroValidator
       end
 
       def errors
-        @errors ||= context.errors
+        @errors
       end
 
       def context
@@ -35,17 +35,33 @@ module PoroValidator
       end
 
       def value
+        if entity_is_hash = context.entity.is_a?(::Hash)
+          context.entity.extend(::PoroValidator::Utils::DeepFetch)
+        end
+
         if nested?
-          @value = attribute.flatten.inject(context.entity, :public_send)
+          if entity_is_hash
+            @value = context.entity.deep_fetch(*attribute.flatten) do
+              nil
+            end
+          else
+            @value = attribute.flatten.inject(context.entity, :public_send)
+          end
         else
-          @value = context.entity.public_send(attribute)
+          if entity_is_hash
+            @value = context.entity.deep_fetch(attribute) do
+              nil
+            end
+          else
+            @value = context.entity.public_send(attribute)
+          end
         end
       end
 
       # @private
       def __validate__(validator_context)
         @context = validator_context
-        @errors  = context.errors
+        @errors  = validator_context.errors
         validate(attribute, value, options)
       end
     end

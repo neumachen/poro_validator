@@ -50,5 +50,8 @@ require "poro_validator/validators/float_validator"
 require "poro_validator/validators/length_validator"
 require "poro_validator/validators/numeric_validator"
 
+# Utils
+require "poro_validator/utils/deep_fetch"
+
 # Modules
 require "poro_validator/validator"
