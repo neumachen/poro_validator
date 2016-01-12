@@ -31,6 +31,7 @@ you want to validate we define it in a seperate class making it *subjective*.
 ## Features ##
 - **Familiar, simple and consistent API.**
 - **Framework agnostic, all you need is a PORO**.
+- **Validate Hash objects! Good for params, json objects what have you!**
 - **Validation logic is decoupled from business logic by creating seperate *validator* classes
   which allows easy testing for the validator class**.
 - **No magic, caller is in control.**
@@ -64,7 +65,7 @@ $ gem install poro_validator
 
 ## Usage ##
 
-### Creating and using the validator ###
+### Creating and using a validator ###
 ```ruby
 # Create a validator
 class CustomerValidator
@@ -75,11 +76,15 @@ class CustomerValidator
   validates :age, numeric: { min: 18 }
 end
 
-customer = CustomerDetail.new
+validator = CustomerValidator.new
 
 # Validate entity
+customer = CustomerDetail.new
+validator.valid?(customer) # => false
+validator.errors.full_messages # => ["last name is not present", "..."]
 
-validator = CustomerValidator.new
+# Validate hash
+customer = {}
 validator.valid?(customer) # => false
 validator.errors.full_messages # => ["last name is not present", "..."]
 ```
