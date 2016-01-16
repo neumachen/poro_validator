@@ -9,39 +9,79 @@
 PoroValidator is a lightweight validation library for your
 **P**lain **O**ld **R**uby **O**bjects (hence PoroValidator).
 
-I always believed that validation is a seperate concern and should not be defined in the object
-that you are going to be validating. This validator library aims to seperate the validation to a
-seperate concern giving it great flexibility and scalability.
+Based on the [Single Responsibility Principle] approach.
 
-It is framework agnostic and can be used on any plain old ruby object/entities.
+This validator library implements the single responsibility approach from the
+[S.O.L.I.D] principle.
+
+By using this approach we can create validations for our object that can be
+easily tested, maintained and scaled.
+
+##TL;DR
+
+- [Features](#features)
+- [Installation](#installation)
+- [Synopsis](#synopsis)
+- [Validators](#validators)
+- [WIKI]
+
+### Author's POV
+I always believed an object's validation is a separate concern and not have
+that functionality be embedded in the object which the validity is in
+question. (ActiveRecord objects validates itself.)
+
+The library I created is framework agnostic and can be used on any plain old
+ruby objects (as long as the object responds to the attribute that requires
+validation it will validate it, this includes **Hash Objects**).
+
+Here's an example scenario:
+
+When working with [Ruby on Rails] because of [ActiveRecord]'s integration we
+only validate an object after it's ActiveRecord object is loaded. But with
+this library it gives you the ability to validate an object at the boundary
+level of your application (when an incoming payload comes through your API -
+think of the parameters that come in when a request is made). Instead of
+initializing an full [ActiveRecord] object just to validate the object, you
+are have now the option of validating the incoming parameters directly!
+
+How you handle the state of that validation (whether it's valid or not) is up
+to you (e.g, return the object so the user's form is still filled and not blank).
 
 #### ActiveRecord/ActiveModel::Validations
-While [ActiveModel::Validations] is great if you've got simple validation logic,
-it doesn't cut it for complex validations needs. When you have different validation
-for the same object at each point in it's life cycle, you need something more flexible.
+[ActiveModel::Validations] is great for simple validation logic. However, as
+your application grows you want to have more complex validations (think of
+normalized tables where your application has numerous join tables) when
+processing the incoming parameters which are most likely going to be nested we
+would need a validator that can handle nested objects fast and return the
+associated errors for the invalid attributes properly. Another scenario is
+throughout the life cycle of an object we would also want different validations
+like if the validation is dependent on the state of an object. So we need a validator
+that's more flexible, enter [PoroValidator].
 
-The problem with [ActiveModel::Validations] is that it hooks pretty deep into [ActiveRecord].
-The main use case for [ActiveModel::Validations] is to prevent bad data hitting your
-database - which isn't always the case (sometimes we want to allow bad data to go through).
-PoroValidator decouples your validation logic from your object structure. With
-PoroValidator you can define different validation rules for different contexts.
-So instead of *objective* validation where the validation is defined in the object
-you want to validate we define it in a seperate class making it *subjective*.
+Another issue with [ActiveModel::Validations] is that it hooks pretty deep into
+[ActiveRecord]. The main use case for [ActiveModel::Validations] within the
+[ActiveRecord] object is to prevent bad data hitting your database - which
+isn't always the case (sometimes we want to allow bad data to go through).
+PoroValidator decouples your validation logic from your object structure.
+With PoroValidator you can define different validation rules for different
+contexts.  So instead of the object validating itself by definining the
+validation within the object, we create separate validation classes that gives
+us more flexibility while adhering the the [Single Responsibility Principle].
 
 ## Features ##
 - **Familiar, simple and consistent API.**
 - **Framework agnostic, all you need is a PORO**.
-- **Validate Hash objects! Good for params, json objects what have you!**
-- **Validation logic is decoupled from business logic by creating seperate *validator* classes
-  which allows easy testing for the validator class**.
-- **No magic, caller is in control.**
-- **Invalid validations does not necessitate inability to persist to database**.
-- [**Conditional Validations via `:if` and `:unless`.**](#conditional-validations)
-- [**Nested validations for nested object structures - nicely handling nested errors.**](#nested-validations)
-- [**Composable validations by reusing existing validators.**](#composable-validations)
-- [**Create custom validators.**](#custom-validators)
-- **Overrideable messages either via the ```:message``` option or through the configuration.**
-- **Easily test validator classes.**
+- **No magic, caller is in control, invalid validations does not necessitate
+inability to persist to database**.
+- [**Conditional Validations**](#conditional-validations)
+- [**Nested validations**](#nested-validations)
+- [**Composable/DRY validations**](#composable-validations)
+- [**Custom validators.**](#custom-validators)
+- **Configurable messages**
+- **SpecHelper for testing validation classes [WIP]
+(https://github.com/magicalbanana/poro_validator/issues/25)**
+
+Feel free the peruse the [WIKI] pages for more information!
 
 ## Installation ##
 
@@ -63,7 +103,7 @@ Or install it yourself as:
 $ gem install poro_validator
 ```
 
-## Usage ##
+## Synopsis ##
 
 ### Creating and using a validator ###
 ```ruby
@@ -74,11 +114,17 @@ class CustomerValidator
   validates :last_name, presence: true
   validates :first_name, presence: true
   validates :age, numeric: { min: 18 }
+  validates :address do
+    validates :line1, presence :true
+    validates :line2, presence :true
+    validates :city, presence: true, inclusion: AmericanCities.all
+    validates :zip_code, format: /[0-9]/
+  end
 end
 
 validator = CustomerValidator.new
 
-# Validate entity
+# Validate an ruby object/entity
 customer = CustomerDetail.new
 validator.valid?(customer) # => false
 validator.errors.full_messages # => ["last name is not present", "..."]
@@ -215,7 +261,10 @@ define it via the [PoroValidator.configuration](#error-messages)
 ### Error Messages ###
 
 #### #configure
-The ```message``` configuration object, allows you to change the default error message produced by each validator. The message must be in the form of a lambda or Proc, and may or may not receive an argument. Use the example below for reference when customizing messages.
+The `message` configuration object, allows you to change the default error
+message produced by each validator. The message must be in the form of a `lambda`
+or `Proc`, and may or may not receive an argument. Use the example below for
+reference when customizing messages.
 
 ```ruby
 PoroValidator.configure do |config|
@@ -227,7 +276,8 @@ end
 ```
 
 #### #on method
-The `on` method is used to acccess the error messages related to a key or attribute/method.
+The `on` method is used to acccess the error messages related to a key or
+attribute/method.
 
 ##### unnested validations
 Pass in either a symbol or a string
@@ -246,7 +296,7 @@ validator.errors.on({address: {country: {coordinates: {planent: :name}}}})
 ```
 
 ## Conditional Validations ##
-You can pass in conditional
+You can pass in conditions
 
 ```ruby
 class CustomerValidator
@@ -258,6 +308,9 @@ class CustomerValidator
   validates :age, presence: { if: :entity_method }
   validates :address do
     validates :line1, presence: { if: 'entity.nested_entity.method' }
+    validates :line2, presence: {
+      [if: foo, unless: :boo, if: 'entity.nested_entity_method']
+    }
   end
 ```
 
@@ -360,11 +413,15 @@ validator.errors.full_messages # => [
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/magicalbanana/poro_validator. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at [PoroValidator].
+This project is intended to be a safe, welcoming space for collaboration, and
+contributors are expected to adhere to the [Contributor Covenant]
+(contributor-covenant.org) code of conduct.
 
 ## License
 
-The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+The gem is available as open source under the terms of the [MIT License]
+(http://opensource.org/licenses/MIT).
 
 ## Copyright
 
@@ -385,3 +442,8 @@ Copyright (c) 2015 Kareem Gan
 
 [ActiveModel::Validations]: http://api.rubyonrails.org/classes/ActiveModel/Validations.html
 [ActiveRecord]: http://guides.rubyonrails.org/active_record_validations.html
+[S.O.L.I.D]: https://en.wikipedia.org/wiki/SOLID_(object-oriented_design)
+[Single Responsibility Principle]: https://en.wikipedia.org/wiki/Single_responsibility_principle
+[Ruby on Rails]: http://rubyonrails.org/
+[PoroValidator]: https://github.com/magicalbanana/poro_validator
+[WIKI]: https://github.com/magicalbanana/poro_validator/wiki
