@@ -82,7 +82,9 @@ module SpecHelpers
           let(:attr) { raise "You must override the let(:attr)!" }
 
           it "does not validate the attribute" do
-            expect(entity).to respond_to(attr)
+            unless entity.is_a?(::Hash)
+              expect(entity).to respond_to(attr)
+            end
             validator.valid?(entity)
             expect(validator.errors.on(attr)).to be_nil,
               expected_message = [
