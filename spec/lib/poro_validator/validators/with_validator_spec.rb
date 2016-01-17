@@ -49,6 +49,28 @@ RSpec.describe PoroValidator::Validators::WithValidator do
       end
     end
 
+    context "entity is a hash object" do
+      expect_validator_to_be_invalid do
+        let(:entity) do
+          {}
+        end
+
+        let(:expected_errors) do
+          {
+            "first_name" => ["is not present"],
+            "last_name" => ["is not present"],
+            "{:address=>:line1}" => ["is not present"],
+            "{:address=>:line2}" => ["is not present"]
+          }
+        end
+
+        skip_attr_unmet_condition do
+          let(:attr) { :dob }
+        end
+      end
+
+    end
+
     expect_validator_to_be_valid do
       let(:entity) do
         OpenStruct.new(
