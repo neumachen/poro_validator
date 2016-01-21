@@ -9,8 +9,9 @@ module PoroValidator
               PoroValidator.const_get(klass).new(attr_name, options)
             rescue NameError => e
               raise(::PoroValidator::ValidatorNotFound.new(
-                "Validator not found: ::PoroValidator::#{klass} exception: #{e}"
-              ))
+                  "Validator not found: ::PoroValidator::#{klass} exception: #{e}"
+                )
+              )
             end
           end
 

@@ -11,9 +11,11 @@ module PoroValidator
       #   e.g, message:, on:, etc.
       def self.build(attr_name, validator, options)
         b = new(attr_name, validator, options)
-        b = Factory::Validators.set_validator(b.attr_name,
-                                              b.validator,
-                                              b.options)
+        b = Factory::Validators.set_validator(
+          b.attr_name,
+          b.validator,
+          b.options
+        )
         b
       end
 
