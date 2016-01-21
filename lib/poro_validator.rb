@@ -19,8 +19,12 @@ module PoroValidator
     mod
   end
 
+  def self.configure(&block)
+    yield(configuration)
+  end
+
   def self.configuration
-    @configuration || Configuration.new
+    @configuration ||= Configuration.new
   end
 end
 
