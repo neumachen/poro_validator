@@ -68,6 +68,7 @@ Gem::Specification.new do |spec|
     lib/poro_validator/version.rb
     poro_validator.gemspec
     spec/features/composable_validations_spec.rb
+    spec/features/configurable_error_messages_spec.rb
     spec/features/inheritable_spec.rb
     spec/features/nested_validations_spec.rb
     spec/features/validate_hash_object_spec.rb
