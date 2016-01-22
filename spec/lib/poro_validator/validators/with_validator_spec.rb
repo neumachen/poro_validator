@@ -7,6 +7,12 @@ class AddressValidator
   validates :line2, presence: true
 end
 
+class FirstNameValidator
+  include PoroValidator.validator
+
+  validates :first_name, presence: true
+end
+
 RSpec.describe PoroValidator::Validators::WithValidator do
   include SpecHelpers::ValidatorTestMacros
 
@@ -15,7 +21,7 @@ RSpec.describe PoroValidator::Validators::WithValidator do
       Class.new do
         include PoroValidator.validator
 
-        validates :first_name, presence: true
+        validates :first_name, with: FirstNameValidator
         validates :last_name, presence: true, if: proc { true }
         validates :dob, presence: true, if: proc { false }
         validates :address, with: AddressValidator
@@ -82,6 +88,34 @@ RSpec.describe PoroValidator::Validators::WithValidator do
             line2: "boo"
           )
         )
+      end
+    end
+
+    expect_validator_to_be_valid do
+      let(:entity) do
+        {
+          first_name: "manbearpig",
+          last_name: "gore",
+          dob: "01/01/1977",
+          address: {
+            line1: "foo",
+            line2: "boo"
+          }
+        }
+      end
+    end
+
+    expect_validator_to_be_valid do
+      let(:entity) do
+        {
+          "first_name" => "manbearpig",
+          "last_name" => "gore",
+          "dob" => "01/01/1977",
+          "address" => {
+            "line1" => "foo",
+            "line2" => "boo"
+          }
+        }
       end
     end
 

@@ -67,6 +67,10 @@ module PoroValidator
     end
 
     def valid?(entity)
+      if entity.is_a?(::Hash)
+        entity.extend(::PoroValidator::Utils::DeepSymbolizeKeys)
+        entity = entity.deep_symbolize_keys
+      end
       validate_entity(entity)
       errors.empty?
     end
