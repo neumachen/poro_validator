@@ -47,6 +47,7 @@ Gem::Specification.new do |spec|
     lib/poro_validator/errors.rb
     lib/poro_validator/exceptions.rb
     lib/poro_validator/utils/deep_fetch.rb
+    lib/poro_validator/utils/deep_symbolize_keys.rb
     lib/poro_validator/validator.rb
     lib/poro_validator/validator/base_class.rb
     lib/poro_validator/validator/conditions.rb
@@ -76,6 +77,7 @@ Gem::Specification.new do |spec|
     spec/lib/poro_validator/error_store_spec.rb
     spec/lib/poro_validator/errors_spec.rb
     spec/lib/poro_validator/utils/deep_fetch_spec.rb
+    spec/lib/poro_validator/utils/deep_symbolize_keys_spec.rb
     spec/lib/poro_validator/validator/base_class_spec.rb
     spec/lib/poro_validator/validator/conditions_spec.rb
     spec/lib/poro_validator/validator/factory_spec.rb
