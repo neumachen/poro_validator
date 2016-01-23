@@ -1,17 +1,14 @@
 module PoroValidator
   module Validators
-    class FloatValidator < BaseClass
+    class FloatValidator < NumericValidator
       def validate(attribute, value, options)
-        message = options.fetch(:message, :float)
-
-        begin
-          Kernel.Float(value.to_s)
-          nil
-        rescue
-          errors.add(attribute, message)
+        if is_numeric?(value.to_s, FLOAT_MATCHER)
+          return
         end
+
+        message = options[:message] || :float
+        errors.add(attribute, message)
       end
     end
   end
 end
-

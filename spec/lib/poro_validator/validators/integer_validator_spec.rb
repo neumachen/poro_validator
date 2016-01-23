@@ -13,30 +13,34 @@ RSpec.describe PoroValidator::Validators::IntegerValidator do
       end.new
     end
 
-    expect_validator_to_be_invalid do
-      let(:entity) do
-        OpenStruct.new(
-          amount: "aaa",
-          rate: "aaa"
-        )
-      end
+    ["aa", 5.00, "+500.00", -1.0, +30.00, "-300.00", "+400.00"].each do |value|
+      expect_validator_to_be_invalid("invalid value: #{value}") do
+        let(:entity) do
+          OpenStruct.new(
+            amount: value,
+            rate: value
+          )
+        end
 
-      let(:expected_errors) do
-        {
-          "amount" => ["is not an integer"]
-        }
-      end
+        let(:expected_errors) do
+          {
+            "amount" => ["is not an integer"]
+          }
+        end
 
-      skip_attr_unmet_condition do
-        let(:attr) { :rate }
+        skip_attr_unmet_condition do
+          let(:attr) { :rate }
+        end
       end
     end
 
-    expect_validator_to_be_valid do
-      let(:entity) do
-        OpenStruct.new(
-          amount: 5
-        )
+    [5, "500", -1, +3000000, "-300", "+400"].each do |value|
+      expect_validator_to_be_valid("valid value: #{value}") do
+        let(:entity) do
+          OpenStruct.new(
+            amount: value
+          )
+        end
       end
     end
   end
