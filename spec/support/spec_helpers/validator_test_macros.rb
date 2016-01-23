@@ -12,8 +12,8 @@ module SpecHelpers
     end
 
     module ClassMethods
-      def expect_validator_to_be_valid(&block)
-        example_group = context("valid entity", caller: caller) do
+      def expect_validator_to_be_valid(desc = "valid entity", &block)
+        example_group = context(desc, caller: caller) do
           it "returns false for #valid?" do
             expect(validator.valid?(entity)).to be_truthy
           end
@@ -32,8 +32,8 @@ module SpecHelpers
         example_group.class_eval(&block) if block_given?
       end
 
-      def expect_validator_to_be_invalid(&block)
-        example_group = context("invalid entity", caller: caller) do
+      def expect_validator_to_be_invalid(desc = "invalid entity", &block)
+        example_group = context(desc, caller: caller) do
           it "returns false for #valid?" do
             expect(validator.valid?(entity)).to be_falsey
           end
