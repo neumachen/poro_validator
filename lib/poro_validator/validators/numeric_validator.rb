@@ -1,47 +1,77 @@
 module PoroValidator
   module Validators
     class NumericValidator < BaseClass
-      def validate(attribute, value, options)
-        message = options.fetch(:message, :numeric)
+      INTEGER_MATCHER = /\A[-+]?(\d+|\d{1,3}(,\d{3})*)\z/.freeze
+      FLOAT_MATCHER   = /\A[-+]?(\d+|\d{1,3}(,\d{3})*)(\.\d+)\z/.freeze
 
-        begin
-          Kernel.Integer(value.to_s)
-          nil
-        rescue
-          errors.add(attribute, :integer)
+      VALID_OPTIONS = [
+        :extremum, :max, :min, :in
+      ].freeze
+
+      VALID_OPTION_VALUES = [
+        ::Range, ::Array, ::Fixnum, ::Numeric
+      ].freeze
+
+      def validate(attribute, value, options)
+        unless is_numeric?(value.to_s, INTEGER_MATCHER) ||
+            is_numeric?(value.to_s, FLOAT_MATCHER)
+          errors.add(attribute, :integer_or_float)
           return
         end
 
-        options.keys.each do |key|
-          matcher = matchers(key)
-          next if matcher.nil?
-          unless matchers(key).call(value, options[key])
-            errors.add(attribute, message, key => options[key])
+        message = options[:message] || :numeric
+
+        validate_numeric_options(options.keys)
+
+        options.each do |k, v|
+          unless VALID_OPTION_VALUES.include?(v.class)
+            raise ::PoroValidator::InvalidValidator.new(
+              "Invalid option: #{k} => #{v}"
+            )
+          end
+
+          unless matchers(k).call(value, v)
+            errors.add(attribute, message, k => v)
           end
         end
       end
 
       private
 
+      def validate_numeric_options(options_keys)
+        opts = options_keys - VALID_OPTIONS
+
+        return if opts.length <= 0
+
+        unless VALID_OPTIONS.include?(opts)
+          raise ::PoroValidator::InvalidValidator.new(
+            "Invalid options: #{opts.inspect} passed for numeric validator."
+          )
+        end
+      end
+
       def matchers(key)
-        m = {
-          extremum: lambda do |value, length|
+        {
+          extremum: proc do |value, length|
             value == length
           end,
 
-          max: lambda do |value, length|
+          max: proc do |value, length|
             value <= length
           end,
 
-          min: lambda do |value, length|
+          min: proc do |value, length|
             value >= length
           end,
 
-          in: lambda do |value, length|
+          in: proc do |value, length|
             length.cover?(value)
           end
-        }
-        m.fetch(key, nil)
+        }[key] || nil
+      end
+
+      def is_numeric?(v, regex_match)
+        v =~ regex_match
       end
     end
   end

@@ -10,3 +10,4 @@
 
 # Generated Markdown files
 *.md.html
+.ruby-version

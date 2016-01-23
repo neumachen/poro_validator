@@ -33,7 +33,7 @@ RSpec.describe PoroValidator::Validators::NumericValidator do
 
       let(:expected_errors) do
         {
-          "section"  => ["is not an integer"],
+          "section"  => ["is not an integer or float type"],
           "amount"   => ["does not match the numeric options: {:in=>1..10}"],
           "cap"      => ["does not match the numeric options: {:extremum=>5}"],
           "bonus"    => ["does not match the numeric options: {:max=>20}"],
@@ -61,6 +61,38 @@ RSpec.describe PoroValidator::Validators::NumericValidator do
           price: 11,
           interest: 19,
           rate: 11
+        )
+      end
+    end
+
+    context "invalid option" do
+      subject(:validator) do
+        Class.new do
+          include PoroValidator.validator
+
+          validates :section, numeric: { mama: 1..10, in: 5..10 }
+        end.new
+      end
+
+      it "raises a ::PoroValidator::Exceptions" do
+        expect { subject.valid?({ section: 12 }) }.to raise_error(
+          ::PoroValidator::InvalidValidator
+        )
+      end
+    end
+
+    context "invalid option value" do
+      subject(:validator) do
+        Class.new do
+          include PoroValidator.validator
+
+          validates :section, numeric: { in: "a" }
+        end.new
+      end
+
+      it "raises a ::PoroValidator::Exceptions" do
+        expect { subject.valid?({ section: 12 }) }.to raise_error(
+          ::PoroValidator::InvalidValidator
         )
       end
     end

@@ -53,10 +53,10 @@ require "poro_validator/validators/with_validator"
 require "poro_validator/validators/range_array_validator"
 require "poro_validator/validators/inclusion_validator"
 require "poro_validator/validators/exclusion_validator"
+require "poro_validator/validators/numeric_validator"
 require "poro_validator/validators/integer_validator"
 require "poro_validator/validators/float_validator"
 require "poro_validator/validators/length_validator"
-require "poro_validator/validators/numeric_validator"
 
 
 # Modules

@@ -1,15 +1,13 @@
 module PoroValidator
   module Validators
-    class IntegerValidator < BaseClass
+    class IntegerValidator < NumericValidator
       def validate(attribute, value, options)
-        message = options.fetch(:message, :integer)
-
-        begin
-          Kernel.Integer(value.to_s)
-          nil
-        rescue
-          errors.add(attribute, message)
+        if is_numeric?(value.to_s, INTEGER_MATCHER)
+          return nil
         end
+
+        message = options[:message] || :integer
+        errors.add(attribute, message)
       end
 
     end
