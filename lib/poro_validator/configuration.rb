@@ -8,6 +8,10 @@ module PoroValidator
         integer:  lambda { "is not an integer" },
         float:    lambda { "is not a float" },
 
+        integer_or_float: lambda do
+          "is not an integer or float type"
+        end,
+
         inclusion: lambda do |range|
           "is not within the range of #{range.inspect}"
         end,
