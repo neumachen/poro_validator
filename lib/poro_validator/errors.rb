@@ -40,7 +40,7 @@ module PoroValidator
     end
 
     def clear_errors
-      store.reset
+      self.store.reset
     end
 
     alias_method :[], :on

@@ -63,7 +63,7 @@ module PoroValidator
     end
 
     def errors
-      @errors ||= ::PoroValidator::Errors.new
+      @errors
     end
 
     def valid?(entity)
@@ -78,8 +78,8 @@ module PoroValidator
     private
 
     def validate_entity(entity)
-      errors.clear_errors
-      context = Context.new(entity, self, errors)
+      @errors = PoroValidator::Errors.new
+      context = Context.new(entity, self, @errors)
       self.class.validations.run_validations(context)
     end
   end
