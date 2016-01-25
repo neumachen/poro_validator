@@ -72,6 +72,7 @@ Gem::Specification.new do |spec|
     spec/features/configurable_error_messages_spec.rb
     spec/features/inheritable_spec.rb
     spec/features/nested_validations_spec.rb
+    spec/features/reuse_validator_spec.rb
     spec/features/validate_hash_object_spec.rb
     spec/lib/poro_validator/configuration_spec.rb
     spec/lib/poro_validator/error_store_spec.rb
