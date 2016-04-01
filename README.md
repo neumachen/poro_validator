@@ -1,7 +1,5 @@
 # PORO Validator #
 
-[![Join the chat at https://gitter.im/magicalbanana/poro_validator](https://badges.gitter.im/magicalbanana/poro_validator.svg)](https://gitter.im/magicalbanana/poro_validator?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 [![Gem Version][GV img]][Gem Version]
 [![Build Status][BS img]][Build Status]
 [![Dependency Status][DS img]][Dependency Status]
@@ -407,7 +405,6 @@ validator.errors.full_messages # => [
   "customer" => "last name is not present", ".."
   "address" => "line1 is not present", ".."
 ]
-```
 
 ## Maintainers
 

@@ -11,3 +11,4 @@
 # Generated Markdown files
 *.md.html
 .ruby-version
+.DS_Store
