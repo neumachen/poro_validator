@@ -1,10 +1,29 @@
-# PORO Validator #
+[Gem Version]: https://badge.fury.io/rb/poro_validator
+[Gem Version Badge]: https://badge.fury.io/rb/poro_validator.svg
+[Build Status]: https://travis-ci.org/magicalbanana/poro_validator
+[Build Status Badge]: https://travis-ci.org/magicalbanana/poro_validator.svg
+[Dependency Status]: https://gemnasium.com/magicalbanana/poro_validator
+[Dependency Status Badge]: https://gemnasium.com/magicalbanana/poro_validator.svg
+[Code Climate]: https://codeclimate.com/github/magicalbanana/poro_validator
+[Code Climate Badge]: https://codeclimate.com/github/magicalbanana/poro_validator.svg
+[Coverage Report]: https://coveralls.io/github/magicalbanana/poro_validator?branch=master
+[Coverage Report Badge]: https://coveralls.io/repos/magicalbanana/poro_validator/badge.svg?branch=master&service=github
 
-[![Gem Version][GV img]][Gem Version]
-[![Build Status][BS img]][Build Status]
-[![Dependency Status][DS img]][Dependency Status]
-[![Code Climate][CC img]][Code Climate]
-[![Coverage Status][CS img]][Coverage Status]
+[ActiveModel::Validations]: http://api.rubyonrails.org/classes/ActiveModel/Validations.html
+[ActiveRecord]: http://guides.rubyonrails.org/active_record_validations.html
+[S.O.L.I.D]: https://en.wikipedia.org/wiki/SOLID_(object-oriented_design)
+[Single Responsibility Principle]: https://en.wikipedia.org/wiki/Single_responsibility_principle
+[Ruby on Rails]: http://rubyonrails.org/
+[PoroValidator]: https://github.com/magicalbanana/poro_validator
+[WIKI]: https://github.com/magicalbanana/poro_validator/wiki
+
+[![Gem Version][Gem Version Badge]][Gem Version]
+[![Build Status][Build Status Badge]][Build Status]
+[![Dependency Status][Dependency Status Badge]][Dependency Status]
+[![Code Climate][Code Climate Badge]][Code Climate]
+[![Coverage Report][Coverage Report Badge]][Coverage Report]
+
+# PORO Validator #
 
 PoroValidator is a lightweight validation library for your
 **P**lain **O**ld **R**uby **O**bjects (hence PoroValidator).
@@ -405,6 +424,7 @@ validator.errors.full_messages # => [
   "customer" => "last name is not present", ".."
   "address" => "line1 is not present", ".."
 ]
+```
 
 ## Maintainers
 
@@ -424,25 +444,4 @@ The gem is available as open source under the terms of the [MIT License]
 
 ## Copyright
 
-Copyright (c) 2015 Kareem Gan
-
-[Gem Version]: https://badge.fury.io/rb/poro_validator
-[Build Status]: https://travis-ci.org/magicalbanana/poro_validator
-[travis pull requests]: https://travis-ci.org/magicalbanana/poro_validator/pull_requests
-[Dependency Status]: https://gemnasium.com/magicalbanana/poro_validator
-[Code Climate]: https://codeclimate.com/github/magicalbanana/poro_validator
-[Coverage Status]: https://coveralls.io/r/magicalbanana/poro_validator
-
-[GV img]: https://badge.fury.io/rb/poro_validator.svg
-[BS img]: https://travis-ci.org/magicalbanana/poro_validator.svg
-[DS img]: https://gemnasium.com/magicalbanana/poro_validator.svg
-[CC img]: https://codeclimate.com/github/magicalbanana/poro_validator.svg
-[CS img]: https://coveralls.io/repos/magicalbanana/poro_validator/badge.svg?branch=master&service=github
-
-[ActiveModel::Validations]: http://api.rubyonrails.org/classes/ActiveModel/Validations.html
-[ActiveRecord]: http://guides.rubyonrails.org/active_record_validations.html
-[S.O.L.I.D]: https://en.wikipedia.org/wiki/SOLID_(object-oriented_design)
-[Single Responsibility Principle]: https://en.wikipedia.org/wiki/Single_responsibility_principle
-[Ruby on Rails]: http://rubyonrails.org/
-[PoroValidator]: https://github.com/magicalbanana/poro_validator
-[WIKI]: https://github.com/magicalbanana/poro_validator/wiki
+Copyright (c) 2015-2016 Kareem Gan
