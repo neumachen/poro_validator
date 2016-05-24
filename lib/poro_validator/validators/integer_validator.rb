@@ -2,6 +2,8 @@ module PoroValidator
   module Validators
     class IntegerValidator < NumericValidator
       def validate(attribute, value, options)
+        return if value.nil?
+
         if is_numeric?(value.to_s, INTEGER_MATCHER)
           return nil
         end

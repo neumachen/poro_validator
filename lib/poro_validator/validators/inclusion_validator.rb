@@ -2,6 +2,8 @@ module PoroValidator
   module Validators
     class InclusionValidator < RangeArrayValidator
       def validate(attribute, value, options)
+        return if value.nil?
+
         in_option = options[:in]
 
         unless validate_option(in_option)

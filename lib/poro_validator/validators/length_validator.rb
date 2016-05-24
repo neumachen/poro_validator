@@ -2,6 +2,8 @@ module PoroValidator
   module Validators
     class LengthValidator < BaseClass
       def validate(attribute, value, options)
+        return if value.nil?
+
         message = options.fetch(:message, :length)
 
         options.keys.each do |key|
