@@ -1,5 +1,6 @@
 module PoroValidator
   module Validators
+    # @private since 0.0.1
     class RangeArrayValidator < BaseClass
       def validate_option(option)
         !option.nil? && (option.is_a?(::Range) || option.is_a?(::Array))

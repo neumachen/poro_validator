@@ -13,6 +13,8 @@ module PoroValidator
       ].freeze
 
       def validate(attribute, value, options)
+        return if value.nil?
+
         unless is_numeric?(value.to_s, INTEGER_MATCHER) ||
             is_numeric?(value.to_s, FLOAT_MATCHER)
           errors.add(attribute, :integer_or_float)
