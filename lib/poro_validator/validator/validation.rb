@@ -1,5 +1,6 @@
 module PoroValidator
   module Validator
+    # @private
     class Validation
       # Builds a validation from the params passed which is initiated first
       # then passed into the Validators.set_validator method

@@ -20,7 +20,7 @@ RSpec.describe PoroValidator::Validator::BaseClass do
 
     let(:klass) do
       Class.new do
-        def __validate__(kotenxt)
+        def validate_context(kotenxt)
           true
         end
       end
@@ -36,9 +36,9 @@ RSpec.describe PoroValidator::Validator::BaseClass do
         subject << validator1
         subject << validator2
 
-        expect(validator1[:validator]).to receive(:__validate__).
+        expect(validator1[:validator]).to receive(:validate_context).
           with(kontext).once
-        expect(validator2[:validator]).to receive(:__validate__).
+        expect(validator2[:validator]).to receive(:validate_context).
           with(kontext).once
 
         subject.run_validations(kontext)
@@ -53,7 +53,7 @@ RSpec.describe PoroValidator::Validator::BaseClass do
 
         subject << validator
 
-        expect(validator[:validator]).to_not receive(:__validate__)
+        expect(validator[:validator]).to_not receive(:validate_context)
 
         subject.run_validations(kontext)
       end
