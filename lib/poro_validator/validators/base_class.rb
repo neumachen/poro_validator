@@ -59,7 +59,7 @@ module PoroValidator
       end
 
       # @private
-      def __validate__(validator_context)
+      def validate_context(validator_context)
         @context = validator_context
         @errors  = validator_context.errors
         validate(attribute, value, options)

@@ -10,11 +10,11 @@ module PoroValidator
         @validations = []
       end
 
-      # Public - Calls the internal #__run_validations__ method to perform the
+      # Public - Calls the internal #validate method to perform the
       # validations stored in the @validations instance array against a
       # validator context if the conditions are truthy.
       def run_validations(context)
-        __run_validations__(context)
+        validate(context)
       end
 
       # Adds/appends validations to the validations array
@@ -38,16 +38,15 @@ module PoroValidator
       private
 
       # @private
-      def __run_validations__(context)
+      def validate(context)
         validations.each do |validation|
-          validator  = validation[:validator]
           conditions = validation[:conditions] || {}
 
           unless conditions.empty?
             next unless Conditions.matched?(conditions, context)
           end
 
-          validator.__validate__(context)
+          validation[:validator].validate_context(context)
         end
       end
     end
