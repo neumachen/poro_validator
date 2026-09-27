@@ -1,0 +1,9 @@
+# Test-only dependencies, locked in Gemfile.test.lock. See DEVELOPMENT.md.
+# Kept apart from Gemfile, whose optional debugging tools (one sourced from
+# Git) and Coveralls are not needed to run the specs.
+source 'https://rubygems.org'
+
+gem 'rspec', '~> 3.13'
+gem 'simplecov', '~> 0.22'
+gem 'recursive-open-struct', '~> 2.1' # spec/features/nested_validations_spec.rb
+gem 'ostruct', '~> 0.6'                # OpenStruct entities throughout spec/
