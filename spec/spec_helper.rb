@@ -1,6 +1,7 @@
 require 'simplecov'
 require 'rspec'
 require 'poro_validator'
+require 'ostruct' # OpenStruct entities are used throughout the specs
 
 Dir["./spec/support/**/*.rb"].sort.each { |f| require f }
 
