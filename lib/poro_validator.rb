@@ -31,6 +31,7 @@ end
 # Utils
 require "poro_validator/utils/deep_fetch"
 require "poro_validator/utils/deep_symbolize_keys"
+require "poro_validator/utils/stable_inspect"
 
 # Base Classes
 require "poro_validator/version"
