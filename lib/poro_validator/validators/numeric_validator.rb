@@ -8,8 +8,10 @@ module PoroValidator
         :extremum, :max, :min, :in
       ].freeze
 
+      # 1.class keeps the exact-class check ::Fixnum gave: Fixnum before Ruby
+      # 2.4, Integer after (::Fixnum was an alias for it until removed in 3.2).
       VALID_OPTION_VALUES = [
-        ::Range, ::Array, ::Fixnum, ::Numeric
+        ::Range, ::Array, 1.class, ::Numeric
       ].freeze
 
       def validate(attribute, value, options)
