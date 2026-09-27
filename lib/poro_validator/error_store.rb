@@ -9,7 +9,7 @@ module PoroValidator
 
     def get(key)
       validate_key!(key)
-      @data[key.to_s]
+      @data[stored_key(key)]
     end
 
     def set(key, value = nil, &block)
@@ -19,18 +19,18 @@ module PoroValidator
           { n => a }
         end
       end
-      @data[key.to_s] = block_given? ? yield : value
+      @data[stored_key(key)] = block_given? ? yield : value
     end
 
     def set?(key)
       validate_key!(key)
-      @data.keys.include?(key.to_s)
+      @data.keys.include?(stored_key(key))
     end
 
     def load(data)
       data.each do |key, value|
         validate_key!(key)
-        @data[key.to_s] = value
+        @data[stored_key(key)] = value
       end
     end
 
@@ -39,6 +39,16 @@ module PoroValidator
     end
 
     private
+
+    # Keys are stored as text. Nested attribute keys are hashes, so render
+    # them the same way on every Ruby (Hash#inspect changed in Ruby 3.4).
+    def stored_key(key)
+      if key.is_a?(::Hash) || key.is_a?(::Array)
+        Utils::StableInspect.call(key)
+      else
+        key.to_s
+      end
+    end
 
     def validate_key!(key)
       unless key.is_a?(::String) || key.is_a?(::Symbol) || key.is_a?(::Array) \

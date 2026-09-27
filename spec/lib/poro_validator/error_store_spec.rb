@@ -113,6 +113,18 @@ RSpec.describe PoroValidator::ErrorStore do
     end
   end
 
+  describe "nested attribute keys" do
+    let(:store) { described_class.new }
+
+    it "stores them as {:key=>value} text on every Ruby version" do
+      store.set([:address, :line1], ["is not present"])
+
+      expect(store.data.keys).to eq(["{:address=>:line1}"])
+      expect(store.get({ address: :line1 })).to eq(["is not present"])
+      expect(store.get("{:address=>:line1}")).to eq(["is not present"])
+    end
+  end
+
   describe "#reset" do
     let(:store) { described_class.new }
 
