@@ -96,5 +96,91 @@ RSpec.describe PoroValidator::Validators::NumericValidator do
         )
       end
     end
+
+    # Boundaries not covered above, including integer options beyond the old
+    # Fixnum range.
+    context "integer option values" do
+      subject(:validator) do
+        Class.new do
+          include PoroValidator.validator
+
+          validates :bounded, numeric: { min: 10, max: 20 }
+          validates :inclusive, numeric: 1..10
+          validates :exclusive, numeric: 1...10
+          validates :cap, numeric: { extremum: 5 }
+          validates :negative, numeric: { min: -10, max: 0 }
+          validates :large, numeric: { min: 2**64, max: 2**65 }
+        end.new
+      end
+
+      # The message embeds the failing option via Hash#inspect, whose output
+      # changed in Ruby 3.4, so the expected text is built the same way.
+      def numeric_error(option)
+        "does not match the numeric options: #{option.inspect}"
+      end
+
+      expect_validator_to_be_valid("values at the lower bounds") do
+        let(:entity) do
+          OpenStruct.new(bounded: 10, exclusive: 1, negative: -10, large: 2**64)
+        end
+      end
+
+      expect_validator_to_be_valid("values at the upper bounds") do
+        let(:entity) do
+          OpenStruct.new(bounded: 20, exclusive: 9, negative: 0, large: 2**65)
+        end
+      end
+
+      expect_validator_to_be_invalid("values one below the lower bounds") do
+        let(:entity) do
+          OpenStruct.new(
+            bounded: 9,
+            inclusive: 0,
+            exclusive: 0,
+            cap: 4,
+            negative: -11,
+            large: 2**64 - 1
+          )
+        end
+
+        let(:expected_errors) do
+          {
+            "bounded"   => [numeric_error(min: 10)],
+            "inclusive" => [numeric_error(in: 1..10)],
+            "exclusive" => [numeric_error(in: 1...10)],
+            "cap"       => [numeric_error(extremum: 5)],
+            "negative"  => [numeric_error(min: -10)],
+            "large"     => [numeric_error(min: 2**64)]
+          }
+        end
+      end
+
+      expect_validator_to_be_invalid("values one above the upper bounds") do
+        let(:entity) do
+          OpenStruct.new(exclusive: 10, negative: 1, large: 2**65 + 1)
+        end
+
+        let(:expected_errors) do
+          {
+            "exclusive" => [numeric_error(in: 1...10)],
+            "negative"  => [numeric_error(max: 0)],
+            "large"     => [numeric_error(max: 2**65)]
+          }
+        end
+      end
+
+      expect_validator_to_be_valid("nil values") do
+        let(:entity) do
+          OpenStruct.new(
+            bounded: nil,
+            inclusive: nil,
+            exclusive: nil,
+            cap: nil,
+            negative: nil,
+            large: nil
+          )
+        end
+      end
+    end
   end
 end
