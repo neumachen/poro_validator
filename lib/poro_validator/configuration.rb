@@ -13,23 +13,23 @@ module PoroValidator
         end,
 
         inclusion: lambda do |range|
-          "is not within the range of #{range.inspect}"
+          "is not within the range of #{Utils::StableInspect.call(range)}"
         end,
 
         exclusion: lambda do |range|
-          "is not outside the range of #{range.inspect}"
+          "is not outside the range of #{Utils::StableInspect.call(range)}"
         end,
 
         format: lambda do |pattern|
-          "does not match the pattern: #{pattern.inspect}"
+          "does not match the pattern: #{Utils::StableInspect.call(pattern)}"
         end,
 
         length: lambda do |length|
-          "does not match the length options: #{length.inspect}"
+          "does not match the length options: #{Utils::StableInspect.call(length)}"
         end,
 
         numeric: lambda do |numeric|
-          "does not match the numeric options: #{numeric.inspect}"
+          "does not match the numeric options: #{Utils::StableInspect.call(numeric)}"
         end
       }
 

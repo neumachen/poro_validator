@@ -113,12 +113,6 @@ RSpec.describe PoroValidator::Validators::NumericValidator do
         end.new
       end
 
-      # The message embeds the failing option via Hash#inspect, whose output
-      # changed in Ruby 3.4, so the expected text is built the same way.
-      def numeric_error(option)
-        "does not match the numeric options: #{option.inspect}"
-      end
-
       expect_validator_to_be_valid("values at the lower bounds") do
         let(:entity) do
           OpenStruct.new(bounded: 10, exclusive: 1, negative: -10, large: 2**64)
@@ -145,12 +139,12 @@ RSpec.describe PoroValidator::Validators::NumericValidator do
 
         let(:expected_errors) do
           {
-            "bounded"   => [numeric_error(min: 10)],
-            "inclusive" => [numeric_error(in: 1..10)],
-            "exclusive" => [numeric_error(in: 1...10)],
-            "cap"       => [numeric_error(extremum: 5)],
-            "negative"  => [numeric_error(min: -10)],
-            "large"     => [numeric_error(min: 2**64)]
+            "bounded"   => ["does not match the numeric options: {:min=>10}"],
+            "inclusive" => ["does not match the numeric options: {:in=>1..10}"],
+            "exclusive" => ["does not match the numeric options: {:in=>1...10}"],
+            "cap"       => ["does not match the numeric options: {:extremum=>5}"],
+            "negative"  => ["does not match the numeric options: {:min=>-10}"],
+            "large"     => ["does not match the numeric options: {:min=>#{2**64}}"]
           }
         end
       end
@@ -162,9 +156,9 @@ RSpec.describe PoroValidator::Validators::NumericValidator do
 
         let(:expected_errors) do
           {
-            "exclusive" => [numeric_error(in: 1...10)],
-            "negative"  => [numeric_error(max: 0)],
-            "large"     => [numeric_error(max: 2**65)]
+            "exclusive" => ["does not match the numeric options: {:in=>1...10}"],
+            "negative"  => ["does not match the numeric options: {:max=>0}"],
+            "large"     => ["does not match the numeric options: {:max=>#{2**65}}"]
           }
         end
       end
