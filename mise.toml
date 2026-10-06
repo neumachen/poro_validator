@@ -1,0 +1,75 @@
+# Ruby, Bundler and RSpec for this gem run only inside the development
+# containers defined in compose.yaml. These tasks only drive Docker: no Ruby
+# tool is declared here, so mise installs or provides no host Ruby for them.
+# See DEVELOPMENT.md.
+
+# -- Single-runtime tasks (default: Ruby 4.0, profile rb40) --
+
+[tasks.setup]
+description = "Build the Ruby-4.0 dev image with locked test gems"
+run = "docker compose --profile rb40 build dev"
+
+[tasks.test]
+description = "Run RSpec on Ruby 4.0 in a throwaway container (arguments go to rspec)"
+depends = ["setup"]
+run = 'mkdir -p coverage && HOST_UID="$(id -u)" HOST_GID="$(id -g)" docker compose --profile rb40 run --rm dev bundle exec rspec "$@"'
+
+[tasks."test:load"]
+description = "Run the fresh-process load regression on Ruby 4.0"
+depends = ["setup"]
+run = 'mkdir -p coverage && HOST_UID="$(id -u)" HOST_GID="$(id -g)" docker compose --profile rb40 run --rm dev bundle exec rspec spec/fresh_process_require_spec.rb'
+
+[tasks.shell]
+description = "Open a shell in a throwaway Ruby-4.0 container"
+depends = ["setup"]
+raw = true
+run = 'mkdir -p coverage && HOST_UID="$(id -u)" HOST_GID="$(id -g)" docker compose --profile rb40 run --rm dev bash'
+
+[tasks."verify:clean"]
+description = "Build the Ruby-4.0 image without cache, run the suite, then remove that image"
+run = '''
+img=poro_validator-clean-$$
+if docker image inspect "$img" >/dev/null 2>&1; then
+  echo "verify:clean: tag $img already exists — refusing to overwrite" >&2
+  exit 2
+fi
+docker build --no-cache --progress=plain -t "$img" .
+mkdir -p coverage
+tstat=0
+HOST_UID="$(id -u)" HOST_GID="$(id -g)" docker run --rm --network none --user "$(id -u):$(id -g)" -e HOME=/tmp \
+  -v "$PWD:/app:ro" -v "$PWD/coverage:/app/coverage" -w /app \
+  "$img" bundle exec rspec || tstat=$?
+cstat=0
+docker image rm "$img" || cstat=$?
+if [ "$tstat" -ne 0 ]; then exit "$tstat"; fi
+if [ "$cstat" -ne 0 ]; then exit "$cstat"; fi
+exit 0
+'''
+
+# -- Ruby 3.4 alternative (profile rb34) --
+
+[tasks."setup:rb34"]
+description = "Build the Ruby-3.4 dev image with locked test gems"
+run = "docker compose --profile rb34 build dev34"
+
+[tasks."test:rb34"]
+description = "Run RSpec on Ruby 3.4 (arguments go to rspec)"
+depends = ["setup:rb34"]
+run = 'mkdir -p coverage && HOST_UID="$(id -u)" HOST_GID="$(id -g)" docker compose --profile rb34 run --rm dev34 bundle exec rspec "$@"'
+
+[tasks."shell:rb34"]
+description = "Open a shell in a throwaway Ruby-3.4 container"
+depends = ["setup:rb34"]
+raw = true
+run = 'mkdir -p coverage && HOST_UID="$(id -u)" HOST_GID="$(id -g)" docker compose --profile rb34 run --rm dev34 bash'
+
+# -- Matrix tasks --
+
+[tasks."matrix:build"]
+description = "Build both Ruby images"
+run = "docker compose --profile rb40 build dev && docker compose --profile rb34 build dev34"
+
+[tasks."matrix:test"]
+description = "Run RSpec on both Ruby versions, building first (arguments go to rspec)"
+depends = ["matrix:build"]
+run = 'sh script/matrix-test "$@"'

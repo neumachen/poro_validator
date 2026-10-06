@@ -1,0 +1,5 @@
+# The image only needs the gem manifest and lockfile; the checkout itself is
+# mounted when containers run (compose.yaml).
+*
+!Gemfile.test
+!Gemfile.test.lock

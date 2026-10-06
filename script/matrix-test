@@ -1,0 +1,18 @@
+#!/bin/sh
+# Run RSpec on both Ruby versions, forwarding all arguments.
+# Called by mise matrix:test task.  Never executes Ruby/Bundler/tests
+# on the host — every project command runs in a container.
+set -e
+cd "$(dirname "$0")/.."
+mkdir -p coverage
+failed=0
+
+echo "=== Ruby 4.0 ==="
+HOST_UID="$(id -u)" HOST_GID="$(id -g)" \
+  docker compose --profile rb40 run --rm dev bundle exec rspec "$@" || failed=1
+
+echo "=== Ruby 3.4 ==="
+HOST_UID="$(id -u)" HOST_GID="$(id -g)" \
+  docker compose --profile rb34 run --rm dev34 bundle exec rspec "$@" || failed=1
+
+exit "$failed"

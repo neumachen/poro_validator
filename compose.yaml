@@ -1,0 +1,53 @@
+# Development containers for poro_validator. Ruby, Bundler and RSpec run here,
+# not on the host; use the mise tasks in mise.toml (see DEVELOPMENT.md).
+# Both images use immutable multi-platform OCI index digests (Docker Hub,
+# 2026-10-01). Only aarch64 execution has been verified.
+
+# Profile "rb40" (default): Ruby 4.0.7-slim-trixie.
+# Profile "rb34": Ruby 3.4.11-slim-trixie.
+# Run both: docker compose --profile rb40 --profile rb34 build
+
+name: poro_validator
+
+services:
+  dev:
+    profiles: [rb40]
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: poro_validator-dev-rb40
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    working_dir: /app
+    environment:
+      HOME: /tmp
+    network_mode: none
+    volumes:
+      - type: bind
+        source: .
+        target: /app
+        read_only: true
+      - type: bind
+        source: ./coverage
+        target: /app/coverage
+
+  dev34:
+    profiles: [rb34]
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        RUBY_BASE: ruby:3.4.11-slim-trixie@sha256:4677fd16f2b54ef534d18b0e34e20a15726b62c203cb996fd70297a058864c60
+    image: poro_validator-dev-rb34
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    working_dir: /app
+    environment:
+      HOME: /tmp
+    network_mode: none
+    volumes:
+      - type: bind
+        source: .
+        target: /app
+        read_only: true
+      - type: bind
+        source: ./coverage
+        target: /app/coverage
