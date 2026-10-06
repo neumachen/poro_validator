@@ -43,12 +43,17 @@ end
 #
 #############################################################################
 
-require 'rspec/core/rake_task'
-
-RSpec::Core::RakeTask.new(:spec) do |t|
-  ENV["COVERAGE"] = "true"
-  t.pattern = Dir.glob('spec/**/*_spec.rb')
-  t.rspec_opts = '--format documentation'
+begin
+  require 'rspec/core/rake_task'
+  RSpec::Core::RakeTask.new(:spec) do |t|
+    ENV["COVERAGE"] = "true"
+    t.pattern = Dir.glob('spec/**/*_spec.rb')
+    t.rspec_opts = '--format documentation'
+  end
+rescue LoadError
+  task :spec do
+    abort "RSpec is not available. Install it to run tests."
+  end
 end
 
 task default: :test
@@ -99,31 +104,14 @@ task build: :gemspec do
 end
 
 task gemspec: :validate do
-  # read spec file and split out manifest section
-  spec = File.read(gemspec_file)
-  head, manifest, tail = spec.split("  # = MANIFEST =\n")
-
-  # replace name version and date
-  replace_header(head, :name)
-  replace_header(head, :version)
-  replace_header(head, :date)
-  #comment this out if your rubyforge_project has a different name
-  replace_header(head, :rubyforge_project)
-
-  # determine file list from git ls-files
-  files = `git ls-files`.
-    split("\n").
-    sort.
-    reject { |file| file =~ /^\./ }.
-    reject { |file| file =~ /^(rdoc|pkg)/ }.
-    map { |file| "    #{file}" }.
-    join("\n")
-
-  # piece file back together and write
-  manifest = "  spec.files = %w[\n#{files}\n  ]\n"
-  spec = [head, manifest, tail].join("  # = MANIFEST =\n")
-  File.open(gemspec_file, 'w') { |io| io.write(spec) }
-  puts "Updated #{gemspec_file}"
+  spec = Gem::Specification.load(gemspec_file)
+  unless spec.files.include?("lib/poro_validator/utils/stable_inspect.rb")
+    abort "gemspec missing stable_inspect.rb"
+  end
+  if spec.files.any? { |f| f.start_with?("spec/") }
+    abort "gemspec should not include spec/ files"
+  end
+  puts "gemspec OK: #{spec.files.length} files"
 end
 
 task :validate do
