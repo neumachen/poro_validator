@@ -1,4 +1,5 @@
 require 'simplecov'
+SimpleCov.start
 require 'rspec'
 require 'poro_validator'
 require 'ostruct' # OpenStruct entities are used throughout the specs
@@ -29,7 +30,6 @@ RSpec.configure do |config|
     config.profile_examples = 10
 
     config.order = :random
-
     Kernel.srand config.seed
   end
 end
