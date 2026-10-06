@@ -23,6 +23,28 @@ RSpec.describe "Allow configuration for error messages", type: :feature do
     )
   end
 
+  it "passes the original option object to a custom message" do
+    received = nil
+    ::PoroValidator.configure do |config|
+      config.message.set(:inclusion, lambda { |choices|
+        received = choices
+        "is not allowed"
+      })
+    end
+    choices = [1]
+    choices << choices
+
+    validator = Class.new do
+      include PoroValidator.validator
+
+      validates :tier, inclusion: { in: choices }
+    end.new
+
+    validator.valid?(OpenStruct.new(tier: 2))
+    expect(received).to be(choices)
+    expect(validator.errors.on(:tier)).to eq(["is not allowed"])
+  end
+
   after(:each) do
     # reset the custom messages
     # if this is not done, there will be flapping test wherever

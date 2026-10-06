@@ -78,4 +78,52 @@ RSpec.describe PoroValidator::Validators::InclusionValidator do
       end
     end
   end
+
+  describe "error messages for options that contain themselves or define #inspect" do
+    let(:entity) { OpenStruct.new(tier: :missing) }
+
+    def validator_for(choices)
+      Class.new do
+        include PoroValidator.validator
+
+        validates :tier, inclusion: { in: choices }
+      end.new
+    end
+
+    it "reports an array that contains itself" do
+      choices = [1]
+      choices << choices
+      validator = validator_for(choices)
+
+      expect(validator.valid?(entity)).to be(false)
+      expect(validator.errors.on(:tier)).to eq(
+        ["is not within the range of [1, [...]]"]
+      )
+    end
+
+    it "reports an array holding a hash that contains itself" do
+      choice = {}
+      choice[:self] = choice
+      validator = validator_for([choice])
+
+      expect(validator.valid?(entity)).to be(false)
+      expect(validator.errors.on(:tier)).to eq(
+        ["is not within the range of [{:self=>{...}}]"]
+      )
+    end
+
+    it "uses the options' own #inspect" do
+      choices = Class.new(::Array) do
+        def inspect
+          "<custom choices>"
+        end
+      end.new([1, 2])
+      validator = validator_for(choices)
+
+      expect(validator.valid?(entity)).to be(false)
+      expect(validator.errors.on(:tier)).to eq(
+        ["is not within the range of <custom choices>"]
+      )
+    end
+  end
 end
