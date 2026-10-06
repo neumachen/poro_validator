@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04-arm
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - profile: rb40
+            service: dev
+          - profile: rb34
+            service: dev34
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Prepare coverage directory
+        run: mkdir -p coverage
+
+      - name: Build image
+        run: |
+          HOST_UID="$(id -u)" HOST_GID="$(id -g)" \
+            docker compose --profile "${{ matrix.profile }}" build "${{ matrix.service }}"
+
+      - name: Record Ruby/Bundler identity
+        run: |
+          HOST_UID="$(id -u)" HOST_GID="$(id -g)" \
+            docker compose --profile "${{ matrix.profile }}" run --rm "${{ matrix.service }}" ruby -v
+          HOST_UID="$(id -u)" HOST_GID="$(id -g)" \
+            docker compose --profile "${{ matrix.profile }}" run --rm "${{ matrix.service }}" bundle _2.6.9_ -v
+
+      - name: RSpec seed 9262026
+        run: |
+          HOST_UID="$(id -u)" HOST_GID="$(id -g)" \
+            docker compose --profile "${{ matrix.profile }}" run --rm "${{ matrix.service }}" bundle exec rspec --seed 9262026
+
+      - name: RSpec seed 20260927
+        run: |
+          HOST_UID="$(id -u)" HOST_GID="$(id -g)" \
+            docker compose --profile "${{ matrix.profile }}" run --rm "${{ matrix.service }}" bundle exec rspec --seed 20260927
+
+      - name: Fresh-process load spec
+        run: |
+          HOST_UID="$(id -u)" HOST_GID="$(id -g)" \
+            docker compose --profile "${{ matrix.profile }}" run --rm "${{ matrix.service }}" bundle exec rspec spec/fresh_process_require_spec.rb

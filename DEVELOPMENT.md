@@ -306,3 +306,42 @@ messages produced by a child validator that recorded `[:country, :code]`.
   by the library before this change; do not regenerate them with the current
   code.
 
+## Continuous Integration
+
+A GitHub Actions workflow (`.github/workflows/ci.yml`) runs on `push` and
+`pull_request`, with no branch-name assumptions and no other triggers
+(no schedule, `workflow_dispatch`, `pull_request_target`, or release
+events). Permissions are read-only (`contents: read`); no secrets, write
+tokens, caches, coverage upload, or artifact upload are used.
+
+Jobs run on `ubuntu-24.04-arm`, matching the only architecture this
+project's containers have been exercised on (AMD64 is not promised). The
+matrix has two entries, one per supported Ruby branch, each selecting the
+matching Compose profile and service already defined in `compose.yaml`:
+
+| Matrix entry | Compose profile | Compose service |
+|---|---|---|
+| Ruby 4.0.7 | `rb40` | `dev` |
+| Ruby 3.4.11 | `rb34` | `dev34` |
+
+Each job: checks out the repository with `actions/checkout` pinned to a
+full commit SHA (`3d3c42e5aac5ba805825da76410c181273ba90b1`, tag `v7.0.1`)
+with `persist-credentials: false`; builds the selected Compose service from
+the existing `Dockerfile` and locked `Gemfile.test.lock` (this build step
+needs network to fetch gems, same as building the image locally); then runs
+RSpec with two full-suite seeds and the fresh-process load spec inside the
+built container, which runs with `network_mode: none` as already configured
+in `compose.yaml`. `fail-fast: false` so one Ruby branch's failure doesn't
+hide the other's result; no `continue-on-error` anywhere, so a nonzero
+RSpec exit fails the job.
+
+The workflow uses `docker compose` directly (the same commands `mise`'s
+tasks and `script/matrix-test` wrap), so no host `mise` installation or
+other GitHub Action beyond `actions/checkout` is required.
+
+This workflow has been locally verified by running its underlying
+`docker compose build`/`docker compose run` command sequence, for both
+matrix entries, in disposable containers on this project's existing
+pinned/cached images -- see `tmp/container-ci-evidence/COMPLETION-REPORT.md`.
+It has not yet had an observed hosted GitHub Actions run; no status badge
+is added until an owner-authorized hosted result exists.
