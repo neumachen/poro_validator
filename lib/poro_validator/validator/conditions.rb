@@ -25,8 +25,9 @@ module PoroValidator
           end
         end
 
-        return false if results.include?(false)
-        true
+        # Every condition has been evaluated. As in Ruby, a nil or false result
+        # fails its condition and any other result passes it.
+        results.all?
       end
 
       def initialize(context)
@@ -41,7 +42,14 @@ module PoroValidator
           when Symbol
             condition_type[Symbol].call(context, condition)
           when Proc
-            condition.call(context)
+            # A lambda without parameters can't take the context. Every other
+            # Proc or lambda gets it, including a Proc whose only parameter is
+            # optional, although its arity is 0 too.
+            if condition.lambda? && condition.arity.zero?
+              condition.call
+            else
+              condition.call(context)
+            end
           else
             raise ::PoroValidator::InvalidCondition.new(
               "Unimplemented condition: #{condition.inspect}"
@@ -63,7 +71,7 @@ module PoroValidator
       def condition_type
         {
           String => lambda { |context, string| context.entity.instance_eval(string) },
-          Symbol => lambda { |context, method| context.send(method, context.entity) },
+          Symbol => lambda { |context, method| context.context.send(method, context.entity) },
         }
       end
     end
