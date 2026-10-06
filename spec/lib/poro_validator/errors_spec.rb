@@ -14,6 +14,33 @@ RSpec.describe PoroValidator::Errors do
       errors.add(:foo, "excelsior")
       expect(errors.on(:foo)).to eq(["manbearpig", "excelsior"])
     end
+
+    context "with an Array path" do
+      it "keeps every message, in order and including repeats", :aggregate_failures do
+        errors.add([:address, :line1], "is too short")
+        errors.add([:address, :line1], "is not OK")
+        errors.add({ address: :line1 }, "is not OK")
+        errors.add([[:address], :line1], "is still not OK")
+        messages = ["is too short", "is not OK", "is not OK", "is still not OK"]
+
+        expect(errors.count).to eq(4)
+        expect(errors.on([:address, :line1])).to eq(messages)
+        expect(errors[[:address, :line1]]).to be(errors.on([:address, :line1]))
+        expect(errors.on({ address: :line1 })).to be(errors.on([:address, :line1]))
+        expect(errors.full_messages).to eq(messages.map { |m| "{:address=>:line1} #{m}" })
+      end
+
+      it "keeps other paths separate", :aggregate_failures do
+        errors.add([:address, :line1], "first")
+        errors.add([:address, :city], "second")
+        errors.add(:name, "third")
+
+        expect(errors.count).to eq(3)
+        expect(errors.on([:address, :line1])).to eq(["first"])
+        expect(errors.on([:address, :city])).to eq(["second"])
+        expect(errors.on(:name)).to eq(["third"])
+      end
+    end
   end
 
   describe "#count" do

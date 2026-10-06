@@ -123,6 +123,119 @@ RSpec.describe PoroValidator::ErrorStore do
       expect(store.get({ address: :line1 })).to eq(["is not present"])
       expect(store.get("{:address=>:line1}")).to eq(["is not present"])
     end
+
+    it "stores a hash key that contains itself and finds it again" do
+      key = {}
+      key[:self] = key
+
+      store.set(key, ["is not valid"])
+
+      expect(store.data.keys).to eq(["{:self=>{...}}"])
+      expect(store.get(key)).to eq(["is not valid"])
+      expect(store.set?(key)).to be(true)
+      expect(store.get("{:self=>{...}}")).to eq(["is not valid"])
+    end
+  end
+
+  describe "Array paths" do
+    let(:store) { described_class.new }
+
+    it "finds what #set wrote, by the same or an equal Array" do
+      path = [:address, :line1]
+      value = ["first"]
+      store.set(path, value)
+      store.set([:address, :city]) { ["from a block"] }
+
+      expect(store.data.keys).to eq(["{:address=>:line1}", "{:address=>:city}"])
+      expect(store.get(path)).to be(value)
+      expect(store.get([:address, :line1])).to be(value)
+      expect(store.set?(path)).to be(true)
+      expect(store.set?([:address, :line1])).to be(true)
+      expect(store.get({ address: :line1 })).to be(value)
+      expect(store.get("{:address=>:line1}")).to be(value)
+      expect(store.get([:address, :city])).to eq(["from a block"])
+    end
+
+    it "keeps the key #set writes for each shape, and reads it back" do
+      {
+        [] => "",
+        [:name] => "name",
+        [:address, :line1] => "{:address=>:line1}",
+        [:address, [:country, :code]] => "{:address=>{:country=>:code}}"
+      }.each do |path, stored|
+        store = described_class.new
+        store.set(path, ["value"])
+
+        expect(store.data.keys).to eq([stored]), "key written for #{path.inspect}"
+        expect(store.get(path)).to eq(["value"]), "get #{path.inspect}"
+        expect(store.set?(path)).to be(true), "set? #{path.inspect}"
+      end
+    end
+
+    it "reads a path through any nesting that flattens to it, leaving frozen keys alone" do
+      path = [:address, [:country, :code].freeze].freeze
+      store.set(path, ["value"])
+
+      [path, [:address, :country, :code], [[:address], [:country, :code]]].each do |same_path|
+        expect(store.get(same_path)).to eq(["value"]), "get #{same_path.inspect}"
+      end
+      expect(path).to eq([:address, [:country, :code]])
+      expect(path).to be_frozen
+      expect(path.last).to be_frozen
+    end
+
+    context "with entries #load wrote or older keys use" do
+      it "still reads Array-shaped keys from #load and from literal text, unchanged" do
+        value = ["loaded"]
+        loaded = described_class.new({ [:address, :line1] => value })
+        literal = described_class.new({ "[:address, :line1]" => value })
+
+        [loaded, literal].each do |store|
+          expect(store.data.keys).to eq(["[:address, :line1]"])
+          expect(store.get([:address, :line1])).to be(value)
+          expect(store.set?([:address, :line1])).to be(true)
+          expect(store.get("[:address, :line1]")).to be(value)
+        end
+      end
+
+      it "prefers the entry #set writes, even when its value is nil or false" do
+        [["current"], nil, false].each do |current|
+          legacy = ["legacy"]
+          store = described_class.new(
+            "[:address, :line1]" => legacy, "{:address=>:line1}" => current
+          )
+
+          expect(store.get([:address, :line1])).to be(current)
+          expect(store.set?([:address, :line1])).to be(true)
+          expect(store.get("[:address, :line1]")).to be(legacy)
+          expect(store.get("{:address=>:line1}")).to be(current)
+        end
+      end
+
+      it "finds nothing when neither entry exists" do
+        expect(store.get([:address, :line1])).to be_nil
+        expect(store.set?([:address, :line1])).to be(false)
+      end
+    end
+
+    context "with a recursive Array" do
+      let(:recursive) { [].tap { |array| array << array } }
+
+      it "still reads an entry #load wrote for it, and finds nothing without one" do
+        loaded = described_class.new({ recursive => ["cycle"] })
+
+        expect(loaded.data.keys).to eq(["[[...]]"])
+        expect(loaded.get(recursive)).to eq(["cycle"])
+        expect(loaded.set?(recursive)).to be(true)
+        expect(store.get(recursive)).to be_nil
+        expect(store.set?(recursive)).to be(false)
+      end
+
+      it "still can't be written by #set" do
+        expect { store.set(recursive, ["new"]) }.
+          to raise_error(ArgumentError, "tried to flatten recursive array")
+      end
+    end
   end
 
   describe "#reset" do

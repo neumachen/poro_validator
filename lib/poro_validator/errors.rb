@@ -9,7 +9,15 @@ module PoroValidator
 
     def add(attr, validator, *msg_opts)
       if store.set?(attr)
-        store.get(attr) << message_lookup(validator, *msg_opts)
+        target = store
+        messages = target.get(attr)
+        # Only an ErrorStore keeps path records; any other store gets the
+        # plain append.
+        if ErrorStore === target
+          target.__append__(attr, messages) { message_lookup(validator, *msg_opts) }
+        else
+          messages << message_lookup(validator, *msg_opts)
+        end
       else
         store.set(attr, [message_lookup(validator, *msg_opts)])
       end
